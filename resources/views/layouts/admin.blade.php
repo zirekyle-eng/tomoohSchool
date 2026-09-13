@@ -36,5 +36,6 @@
         @yield('content')
     </main>
 </div>
+@include('partials.site-footer')
 </body>
 </html>

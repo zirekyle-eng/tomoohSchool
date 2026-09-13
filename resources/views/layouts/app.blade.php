@@ -15,5 +15,6 @@
     @if($errors->any())<div class="alert">{{ $errors->first() }}</div>@endif
     @yield('content')
 </main>
+@include('partials.site-footer')
 </body>
 </html>

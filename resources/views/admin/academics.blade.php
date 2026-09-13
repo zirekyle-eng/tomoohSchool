@@ -59,6 +59,10 @@
             <label class="field">مدة الاشتراك
                 <select name="enrollment_term" required><option value="full_year">المنهج كاملًا</option><option value="first">الفصل الأول</option><option value="second">الفصل الثاني</option></select>
             </label>
+            <label class="field">السعر الشهري (شيكل)
+                <input name="monthly_fee" type="number" min="0" step=".01" value="0" required>
+                <small>يظهر في الكتالوج وصفحة الأسعار وبطاقة التسجيل.</small>
+            </label>
             <label class="field">صورة المادة
                 <input name="image" type="file" accept="image/jpeg,image/png,image/webp"><small>JPG أو PNG أو WebP، بحد أقصى 4MB</small>
             </label>
@@ -109,6 +113,7 @@
                             <span>{{ ['general'=>'مشتركة','scientific'=>'العلمي','literary'=>'الأدبي','sharia'=>'الشرعي','entrepreneurship'=>'الريادة','vocational'=>'المهني'][$subject->tawjihi_branch] ?? 'مشتركة' }}</span>
                             <span>{{ $subject->delivery_type === 'recorded' ? 'مسجلة' : 'مباشرة' }}</span>
                             <span>{{ $subject->sessions_per_week ?? 2 }} حصص أسبوعيًا</span>
+                            <span>{{ number_format((float) $subject->monthly_fee, 2) }} ₪ شهريًا</span>
                         </div>
                     </div>
                 </article>

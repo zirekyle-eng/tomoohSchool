@@ -1,16 +1,16 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\AdminPaymentController;
 use App\Http\Controllers\AdminAcademicsController;
-use App\Http\Controllers\AdminNotificationsController;
 use App\Http\Controllers\AdminApplicationsController;
-use App\Http\Controllers\TeacherController;
-use App\Http\Controllers\PublicController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminNotificationsController;
+use App\Http\Controllers\AdminPaymentController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BigBlueButtonController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PublicController;
+use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\TeacherController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PublicController::class, 'home'])->name('home');
@@ -24,7 +24,7 @@ Route::get('/api/home-teachers', [PublicController::class, 'homeTeachers'])->nam
 Route::get('/about', fn () => app(PublicController::class)->page('about'))->name('about');
 Route::get('/contact', fn () => app(PublicController::class)->page('contact'))->name('contact');
 Route::get('/policies', fn () => app(PublicController::class)->page('policies'))->name('policies');
-Route::get('/pricing', fn () => app(PublicController::class)->page('pricing'))->name('pricing');
+Route::get('/pricing', [PublicController::class, 'pricing'])->name('pricing');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -35,6 +35,7 @@ Route::middleware('guest')->group(function (): void {
 
 Route::middleware('auth')->group(function (): void {
     Route::get('/dashboard', [SubjectController::class, 'dashboard'])->middleware('role:student')->name('dashboard');
+    Route::post('/school-day/start', [SubjectController::class, 'startSchoolDay'])->middleware('role:student')->name('school-day.start');
     Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects.index');
     Route::post('/enrollments', [SubjectController::class, 'enroll'])->name('enrollments.store');
     Route::get('/payment', [PaymentController::class, 'create'])->middleware('role:student')->name('payment.create');

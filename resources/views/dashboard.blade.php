@@ -37,7 +37,8 @@
         .student-day h3{font-size:11px;margin:0 0 8px;color:var(--muted)}
         .lesson{background:#f2edff;border-right:3px solid #7c5ce0;padding:8px;border-radius:7px;margin-top:7px}
         .lesson b,.lesson small{display:block}.lesson b{font-size:10px}.lesson small{font-size:9px;color:#6b5d82;margin-top:3px}
-        .lesson a{display:inline-block;font-size:9px;color:#fff;background:var(--coral);border-radius:7px;padding:7px 9px;font-weight:800;margin-top:7px}
+        .lesson a,.student-welcome button{display:inline-block;font-size:9px;color:#fff;background:var(--coral);border:0;border-radius:7px;padding:7px 9px;font-weight:800;margin-top:7px;cursor:pointer}
+        .lesson-state{display:block;color:#a99bb2!important;margin-top:7px}
         .student-lower{display:grid;grid-template-columns:1.15fr .85fr;gap:20px}
         .student-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
         .student-card{border:1px solid #f0e9f2;border-radius:12px;padding:13px}
@@ -45,7 +46,7 @@
         .student-card.pending{border-color:#ffe1a5;background:#fffaf0}.student-card .button{display:inline-block;margin-top:10px;background:var(--coral);color:#fff;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:800}
         .payment-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f0e9f2;font-size:12px}.payment-row:last-child{border:0}.payment-row span{color:var(--muted);font-size:10px}
         .student-profile{display:grid;grid-template-columns:70px 1fr;gap:16px;align-items:center}.profile-avatar{width:65px;height:65px;border-radius:20px;background:#f3e8ff;color:#7e4fd3;display:grid;place-items:center;font:700 28px 'Baloo Bhaijaan 2'}.student-profile h3{margin:0;font-size:18px}.student-profile p{font-size:11px;color:var(--muted);margin:4px 0}
-        .muted{color:var(--muted);font-size:12px}.success{padding:10px 12px;border-radius:9px;background:#e8f8ef;color:#17734d;font-size:12px}
+        .muted{color:var(--muted);font-size:12px}.success,.error{padding:10px 12px;border-radius:9px;font-size:12px}.success{background:#e8f8ef;color:#17734d}.error{background:#fff0ed;color:#a63e2a}
         @media(max-width:1050px){.student-week{grid-template-columns:repeat(4,1fr)}.student-shell{grid-template-columns:68px 1fr}.student-side{padding:20px 10px}.student-brand span:not(.student-mark),.student-menu a{font-size:0}.student-brand{margin:0 auto 30px}.student-menu a{padding:12px;text-align:center}.student-menu a:first-letter{font-size:17px}.student-logout{font-size:0}}
         @media(max-width:700px){.student-shell{grid-template-columns:1fr}.student-side{display:none}.student-main{padding:22px 15px}.student-head h1{font-size:26px}.student-week{grid-template-columns:repeat(2,1fr)}.student-top-cards,.student-lower{grid-template-columns:1fr}.student-welcome,.student-moodle{display:block}.student-welcome a,.student-moodle a{display:inline-block;margin-top:15px}.student-grid{grid-template-columns:1fr}}
     </style>
@@ -64,16 +65,42 @@
     </aside>
     <main class="student-main">
         @if(session('success'))<p class="success">{{ session('success') }}</p>@endif
+        @if($errors->has('attendance'))<p class="error">{{ $errors->first('attendance') }}</p>@endif
         <header class="student-head"><div><h1>مرحبًا، {{ auth()->user()->full_name }} 👋</h1><p>تابع موادك وجدولك الدراسي من مكان واحد.</p></div><div class="student-avatar">{{ mb_substr(auth()->user()->full_name, 0, 1) }}</div></header>
         <div class="student-top-cards">
-            <section class="student-welcome"><div><h2>جاهز لحصتك القادمة؟</h2><p>راجع جدولك، وادخل للحصة من الرابط عند موعدها.</p></div><a href="#schedule">عرض الجدول</a></section>
+            <section class="student-welcome">
+                <div>
+                    @if(auth()->user()->student_mode === 'regular')
+                        <h2>{{ $attendanceStarted ? 'دوامك مفتوح الآن' : 'ابدأ دوامك اليومي' }}</h2>
+                        <p>من 10:00 إلى 14:00، وستنتقل الحصص تلقائيًا حسب جدولك.</p>
+                    @else
+                        <h2>حصصك المسجلة</h2>
+                        <p>تفتح كل مادة فقط خلال موعد حصتها.</p>
+                    @endif
+                </div>
+                @if(auth()->user()->student_mode === 'regular' && !$attendanceStarted)
+                    <form method="post" action="{{ route('school-day.start') }}">@csrf<button type="submit">بدء الدوام</button></form>
+                @else
+                    <a href="#schedule">عرض الجدول</a>
+                @endif
+            </section>
             <section class="student-moodle"><div><h2>الدخول إلى الغرفة الدراسية</h2><p>استخدم رقم الجوال ونفس كلمة المرور الخاصة بك.</p></div><a href="{{ config('services.moodle.url', '/moodle') }}" target="_blank" rel="noopener">دخول Moodle</a></section>
         </div>
         <section class="student-section" id="schedule"><h2>جدولي الأسبوعي</h2><div class="student-week">
             @foreach([1=>'السبت',2=>'الأحد',3=>'الإثنين',4=>'الثلاثاء',5=>'الأربعاء',6=>'الخميس',7=>'الجمعة'] as $dayNumber => $dayName)
                 <div class="student-day"><h3>{{ $dayName }}</h3>
                     @forelse($classes->where('day_of_week',$dayNumber) as $class)
-                        <article class="lesson"><b>{{ $class->subject_name }}</b><small>{{ $class->teacher_name }} · {{ substr($class->starts_at,0,5) }} - {{ substr($class->ends_at,0,5) }}</small>@if($class->viva_z_join_url)<a href="{{ $class->viva_z_join_url }}" target="_blank" rel="noopener">الدخول إلى الحصة الدراسية ←</a>@endif</article>
+                        <article class="lesson"><b>{{ $class->subject_name }}</b><small>{{ $class->teacher_name }} · {{ substr($class->starts_at,0,5) }} - {{ substr($class->ends_at,0,5) }}</small>
+                            @if($class->access_state === 'open' && (auth()->user()->student_mode !== 'regular' || $attendanceStarted))
+                                <a href="{{ $class->viva_z_join_url }}" target="_blank" rel="noopener">الدخول إلى الحصة الدراسية ←</a>
+                            @elseif($class->access_state === 'upcoming')
+                                <small class="lesson-state">تفتح عند موعدها</small>
+                            @elseif($class->access_state === 'ended')
+                                <small class="lesson-state">انتهت الحصة</small>
+                            @else
+                                <small class="lesson-state">ابدأ الدوام للدخول</small>
+                            @endif
+                        </article>
                     @empty<p class="muted">لا توجد حصص</p>@endforelse
                 </div>
             @endforeach
@@ -86,5 +113,6 @@
         <section class="student-section" id="profile"><h2>ملفي الشخصي</h2><div class="student-profile"><div class="profile-avatar">{{ mb_substr(auth()->user()->full_name, 0, 1) }}</div><div><h3>{{ auth()->user()->full_name }}</h3><p>{{ auth()->user()->phone }} · حساب طالب نشط</p></div></div></section>
     </main>
 </div>
+@include('partials.site-footer')
 </body>
 </html>

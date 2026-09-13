@@ -118,6 +118,17 @@
         margin: 0 0 25px 0;
         line-height: 1.6;
     }
+    .subject-price {
+        margin: 4px 0 12px;
+        color: var(--plum);
+        font-size: 1.8rem;
+        font-weight: 800;
+    }
+    .subject-price small {
+        color: var(--muted);
+        font-size: .75rem;
+        font-weight: 500;
+    }
     .btn-primary {
         display: block;
         width: 100%;
@@ -207,6 +218,36 @@
         .sidebar {
             position: static;
         }
+    }
+
+    /* Match the course page to the shared public-page layout. */
+    .subject-hero{min-height:280px;padding:54px 20px 92px;background:linear-gradient(115deg,#291541 0%,#432568 58%,#56377d 100%);text-align:center}
+    .subject-hero::before{top:-180px;right:auto;left:-100px;width:300px;height:300px;background:#ffc857;opacity:.08}
+    .subject-hero-content{max-width:760px;margin:auto}
+    .subject-grade-badge{background:#ffffff18;border:1px solid #ffffff14;color:#ffc857;padding:7px 16px}
+    .subject-title{font-size:clamp(32px,4.5vw,48px);line-height:1.35;margin:17px auto 9px}
+    .subject-subtitle{color:#e8dff0;font-size:14px}
+    .subject-content{padding:0 0 86px;background:#fbf9fd}
+    .subject-content>.container{width:min(1120px,calc(100% - 64px));margin:-30px auto 0;padding:28px;position:relative;z-index:2;border:1px solid #eadfeb;border-radius:22px;background:#fff;box-shadow:0 18px 45px rgba(41,21,65,.1)}
+    .breadcrumb{width:min(1120px,calc(100% - 64px));padding:20px 0 10px}
+    .subject-main-grid{grid-template-columns:1.35fr .75fr;gap:22px;max-width:none}
+    .subject-details-left h2{font-size:24px;color:var(--plum)}
+    .info-card{padding:18px;border-radius:16px;background:#fff;border:1px solid var(--line);border-right:4px solid var(--coral)}
+    .info-grid{gap:12px;margin:20px 0}
+    .info-grid .info-card{background:#fffdfa}
+    .info-card h3{font-size:11px;color:var(--muted)}
+    .info-card-content{font-size:13px}
+    .cta-box{padding:24px 20px;border-radius:18px;box-shadow:none;border:1px solid var(--line)}
+    .cta-box h2{font-size:22px;color:var(--plum)}
+    .btn-primary,.btn-secondary{padding:12px 18px;border-radius:10px;font-size:12px}
+    .note-box{border-right:4px solid var(--sun);border-left:1px solid var(--line);background:#fff7df}
+    @media(max-width:768px){
+        .subject-hero{min-height:260px;padding:42px 18px 82px}
+        .subject-title{font-size:31px}
+        .subject-subtitle{font-size:12px}
+        .subject-content>.container,.breadcrumb{width:min(100% - 20px,600px)}
+        .subject-content>.container{padding:19px 16px 24px;border-radius:20px}
+        .breadcrumb{padding:16px 0 9px}
     }
 </style>
 
@@ -306,7 +347,7 @@
                             <a href="{{ $subject->free_preview_url }}" target="_blank" rel="noopener" class="btn-secondary">▶ مشاهدة النموذج المجاني</a>
                         @endif
 
-                        <a href="https://wa.me/00972569177111?text=مرحباً، أنا مهتم بالتسجيل في مادة: {{ urlencode($subject->name) }}%0Aأرجو إطلاعي على التفاصيل والخطط المتاحة" target="_blank" class="btn-primary">
+                        <a href="{{ route('pricing') }}" class="btn-primary">
                             ✓ تسجيل في المادة
                         </a>
 
@@ -315,12 +356,10 @@
                         </a>
                     </div>
 
-                    @if($subject->monthly_fee > 0)
                         <div class="note-box">
                             <strong>💡 معلومة مهمة</strong>
-                            قد تختلف الرسوم حسب الخطة المختارة. تواصل معنا عبر الواتس لمعرفة جميع الخيارات المتاحة.
+                            لمعرفة الرسوم والباقات المتاحة، انتقل إلى صفحة الأسعار واختر النظام والمنطقة المناسبة لك.
                         </div>
-                    @endif
                 </div>
             </div>
         </div>

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\MoodleService;
 use App\Models\User;
+use App\Services\MoodleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,7 +28,7 @@ class AuthController extends Controller
             ->where('status', 'active')
             ->first();
 
-        if (!$user || !Hash::check($credentials['password'], $user->password_hash)) {
+        if (! $user || ! Hash::check($credentials['password'], $user->password_hash)) {
             return back()->withErrors(['phone' => 'رقم الجوال أو كلمة المرور غير صحيحة.'])->withInput();
         }
 
@@ -55,6 +55,9 @@ class AuthController extends Controller
             'password' => ['required', 'string', 'min:8', 'regex:/[A-Z]/', 'regex:/[^a-zA-Z0-9]/'],
             'country' => ['nullable', 'string', 'max:80'],
             'city' => ['nullable', 'string', 'max:100'],
+            'student_mode' => ['required', 'in:regular,external'],
+            'grade_level' => ['nullable', 'string', 'max:30'],
+            'branch' => ['nullable', 'in:general,scientific,literary'],
         ], [
             'phone.unique' => 'رقم الجوال مستخدم مسبقًا.',
             'password.regex' => 'كلمة المرور يجب أن تحتوي حرفًا كبيرًا ورمزًا خاصًا.',
@@ -65,6 +68,9 @@ class AuthController extends Controller
             'password_hash' => Hash::make($data['password']),
             'status' => 'active',
             'role' => 'student',
+            'student_mode' => $data['student_mode'],
+            'grade_level' => $data['grade_level'] ?? null,
+            'branch' => $data['branch'] ?? null,
             'market_id' => 1,
         ]);
 
@@ -72,7 +78,7 @@ class AuthController extends Controller
         try {
             $moodle->createUser($user->full_name, $data['phone'], $data['password'], 'student');
         } catch (\Throwable $exception) {
-            $message .= ' تعذر إنشاء الحساب في Moodle: ' . $exception->getMessage();
+            $message .= ' تعذر إنشاء الحساب في Moodle: '.$exception->getMessage();
         }
 
         return redirect()->route('login')->with('success', $message);

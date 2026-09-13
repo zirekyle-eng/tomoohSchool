@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Services\MoodleService;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class AdminController extends Controller
@@ -78,21 +78,23 @@ class AdminController extends Controller
         abort_unless(DB::table('users')->where('id', $data['student_id'])->where('role', 'student')->exists(), 422, 'الطالب غير موجود.');
 
         $directory = public_path('uploads/payments');
-        if (!is_dir($directory)) mkdir($directory, 0755, true);
+        if (! is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
         $extension = $request->file('receipt')->extension();
-        $filename = 'admin_receipt_' . bin2hex(random_bytes(10)) . '.' . $extension;
+        $filename = 'admin_receipt_'.bin2hex(random_bytes(10)).'.'.$extension;
         abort_unless($request->file('receipt')->move($directory, $filename), 422, 'تعذر حفظ إشعار الدفع.');
-        $receiptPath = 'public/uploads/payments/' . $filename;
+        $receiptPath = 'public/uploads/payments/'.$filename;
 
         $newSubjectIds = array_values(array_filter($data['subject_ids'], function (int $subjectId) use ($data): bool {
-            return !DB::table('enrollments')
+            return ! DB::table('enrollments')
                 ->where('student_id', $data['student_id'])
                 ->where('subject_id', $subjectId)
                 ->exists();
         }));
 
-        if (!$newSubjectIds) {
-            @unlink($directory . '/' . $filename);
+        if (! $newSubjectIds) {
+            @unlink($directory.'/'.$filename);
 
             return back()->withErrors(['subject_ids' => 'الطالب مسجل مسبقًا في جميع المواد المحددة.']);
         }
@@ -146,10 +148,12 @@ class AdminController extends Controller
         $photoPath = null;
         if ($request->hasFile('photo')) {
             $directory = public_path('uploads/teachers');
-            if (!is_dir($directory)) mkdir($directory, 0755, true);
-            $filename = 'teacher_' . bin2hex(random_bytes(8)) . '.' . $request->file('photo')->extension();
+            if (! is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+            $filename = 'teacher_'.bin2hex(random_bytes(8)).'.'.$request->file('photo')->extension();
             $request->file('photo')->move($directory, $filename);
-            $photoPath = 'public/uploads/teachers/' . $filename;
+            $photoPath = 'public/uploads/teachers/'.$filename;
         }
 
         DB::transaction(function () use ($data, $photoPath): void {
@@ -169,7 +173,7 @@ class AdminController extends Controller
         try {
             $moodle->createUser($data['full_name'], $data['phone'], $data['password'], 'teacher');
         } catch (\Throwable $exception) {
-            $message .= ' تعذر إنشاء حساب المدرس في Moodle: ' . $exception->getMessage();
+            $message .= ' تعذر إنشاء حساب المدرس في Moodle: '.$exception->getMessage();
         }
 
         return back()->with('success', $message);
@@ -182,7 +186,7 @@ class AdminController extends Controller
 
         $data = $request->validate([
             'full_name' => ['required', 'string', 'max:160'],
-            'phone' => ['required', 'string', 'max:30', 'unique:users,phone,' . $id],
+            'phone' => ['required', 'string', 'max:30', 'unique:users,phone,'.$id],
             'email' => ['nullable', 'email', 'max:160'],
             'specialization' => ['nullable', 'string', 'max:180'],
             'years_experience' => ['nullable', 'integer', 'min:0', 'max:60'],
@@ -195,10 +199,12 @@ class AdminController extends Controller
         $photoPath = null;
         if ($request->hasFile('photo')) {
             $directory = public_path('uploads/teachers');
-            if (!is_dir($directory)) mkdir($directory, 0755, true);
-            $filename = 'teacher_' . $id . '_' . bin2hex(random_bytes(6)) . '.' . $request->file('photo')->extension();
+            if (! is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+            $filename = 'teacher_'.$id.'_'.bin2hex(random_bytes(6)).'.'.$request->file('photo')->extension();
             $request->file('photo')->move($directory, $filename);
-            $photoPath = 'public/uploads/teachers/' . $filename;
+            $photoPath = 'public/uploads/teachers/'.$filename;
         }
 
         DB::transaction(function () use ($id, $data, $photoPath): void {
@@ -208,14 +214,18 @@ class AdminController extends Controller
                 'email' => $data['email'] ?? null,
                 'status' => $data['status'],
             ];
-            if (!empty($data['password'])) $userData['password_hash'] = Hash::make($data['password']);
+            if (! empty($data['password'])) {
+                $userData['password_hash'] = Hash::make($data['password']);
+            }
             DB::table('users')->where('id', $id)->update($userData);
             $profile = [
                 'specialization' => $data['specialization'] ?? null,
                 'years_experience' => $data['years_experience'] ?? 0,
                 'bio' => $data['bio'] ?? null,
             ];
-            if ($photoPath !== null) $profile['photo_path'] = $photoPath;
+            if ($photoPath !== null) {
+                $profile['photo_path'] = $photoPath;
+            }
             DB::table('teachers_profiles')->updateOrInsert(['user_id' => $id], $profile);
         });
 
@@ -275,7 +285,7 @@ class AdminController extends Controller
 
     public function accounts(): View
     {
-        $accounts = DB::table('users')->orderByDesc('created_at')->select('id', 'full_name', 'email', 'phone', 'role', 'status', 'country', 'city', 'market_id', 'created_at')->get();
+        $accounts = DB::table('users')->orderByDesc('created_at')->select('id', 'full_name', 'email', 'phone', 'role', 'status', 'country', 'city', 'market_id', 'student_mode', 'grade_level', 'branch', 'created_at')->get();
 
         return view('admin.accounts', compact('accounts'));
     }
@@ -287,12 +297,15 @@ class AdminController extends Controller
 
         $data = $request->validate([
             'full_name' => ['required', 'string', 'max:160'],
-            'email' => ['nullable', 'email', 'max:160', 'unique:users,email,' . $id],
-            'phone' => ['required', 'string', 'max:30', 'unique:users,phone,' . $id],
+            'email' => ['nullable', 'email', 'max:160', 'unique:users,email,'.$id],
+            'phone' => ['required', 'string', 'max:30', 'unique:users,phone,'.$id],
             'role' => ['required', 'in:student,teacher,admin'],
             'status' => ['required', 'in:active,inactive'],
             'country' => ['nullable', 'string', 'max:80'],
             'city' => ['nullable', 'string', 'max:100'],
+            'student_mode' => ['required', 'in:regular,external'],
+            'grade_level' => ['nullable', 'string', 'max:30'],
+            'branch' => ['nullable', 'in:general,scientific,literary'],
             'password' => ['nullable', 'string', 'min:8', 'regex:/[A-Z]/', 'regex:/[^a-zA-Z0-9]/'],
         ]);
 
@@ -300,8 +313,12 @@ class AdminController extends Controller
             'full_name' => $data['full_name'], 'email' => $data['email'] ?? null,
             'phone' => $data['phone'], 'role' => $data['role'], 'status' => $data['status'],
             'country' => $data['country'] ?? null, 'city' => $data['city'] ?? null,
+            'student_mode' => $data['student_mode'], 'grade_level' => $data['grade_level'] ?? null,
+            'branch' => $data['branch'] ?? null,
         ];
-        if (!empty($data['password'])) $userData['password_hash'] = Hash::make($data['password']);
+        if (! empty($data['password'])) {
+            $userData['password_hash'] = Hash::make($data['password']);
+        }
         DB::table('users')->where('id', $id)->update($userData);
 
         return back()->with('success', 'تم حفظ تعديلات الحساب.');

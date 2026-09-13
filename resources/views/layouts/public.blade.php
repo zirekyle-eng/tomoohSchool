@@ -12,5 +12,5 @@
 <body>
 @include('partials.site-nav')
 @yield('content')
-<footer><div class="container footer"><strong><img style="width:34px;height:34px;vertical-align:middle;border-radius:10px;object-fit:cover" src="{{ asset('logo.jpeg') }}" alt="شعار مدرسة طموح الإلكترونية"> مدرسة طموح الإلكترونية</strong><span>نرافقك نحو التفوق، أينما كنت.</span><a href="{{ route('policies') }}">السياسات والشروط</a><span>© 2026</span></div></footer>
+@include('partials.site-footer')
 </body></html>

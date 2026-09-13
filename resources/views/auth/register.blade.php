@@ -71,6 +71,25 @@
                     <input name="phone" type="tel" value="{{ old('phone') }}" required placeholder="أدخل رقم الجوال">
                 </label>
                 <div class="two">
+                    <label>نوع الدراسة
+                        <select name="student_mode" required>
+                            <option value="external" @selected(old('student_mode', request('student_mode', 'external')) === 'external')>طالب مواد منفصلة</option>
+                            <option value="regular" @selected(old('student_mode', request('student_mode')) === 'regular')>طالب نظامي</option>
+                        </select>
+                    </label>
+                    <label>الصف
+                        <input name="grade_level" value="{{ old('grade_level', request('grade_level')) }}" placeholder="مثال: 12">
+                    </label>
+                </div>
+                <div class="two">
+                    <label>الفرع (إن وجد)
+                        <select name="branch">
+                            <option value="">غير محدد</option>
+                            <option value="general" @selected(old('branch', request('branch')) === 'general')>مشترك</option>
+                            <option value="scientific" @selected(old('branch', request('branch')) === 'scientific')>علمي</option>
+                            <option value="literary" @selected(old('branch', request('branch')) === 'literary')>أدبي</option>
+                        </select>
+                    </label>
                     <label>الدولة
                         <select name="country">
                             <option value="فلسطين" @selected(old('country', 'فلسطين') === 'فلسطين')>فلسطين</option>
@@ -95,6 +114,7 @@
         </section>
     </section>
 </main>
+@include('partials.site-footer')
 <script>
 function togglePassword() {
     var input = document.getElementById('password');
