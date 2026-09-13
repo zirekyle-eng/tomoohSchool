@@ -1,0 +1,5 @@
+@extends('layouts.public', ['title' => 'مدرسونا'])
+@section('content')
+<style>.teachers-banner{padding-top:72px}.teachers-banner .section-head{max-width:760px;padding:34px 24px;background:linear-gradient(110deg,#291541,#59369b);border-radius:24px;color:#fff}.teachers-banner .section-head p{color:#e3d8ee}.teachers-banner .section-head h1{font-size:36px}</style>
+<main><section><div class="container"><div class="section-head"><span class="eyebrow">خبرة تساندك</span><h1>مدرسون يشرحون لك بطريقتك</h1><p>مدرسون متخصصون وشرح قريب من الطالب ومتابعة حقيقية لتقدمك.</p></div><div class="grid">@forelse($teachers as $teacher)<a class="card" href="{{ route('teachers.show', $teacher->id) }}"><div class="icon">{{ mb_substr($teacher->full_name, 0, 1) }}</div><h3>{{ $teacher->full_name }}</h3><p>{{ $teacher->specialization ?: 'مدرس معتمد' }}</p><p>{{ $teacher->bio ?: 'مدرس متخصص لمتابعة الطلاب وتبسيط المادة التعليمية.' }}</p><span class="muted">{{ (int)($teacher->years_experience ?? 0) }} سنوات خبرة ←</span></a>@empty<p class="muted">سيتم عرض المدرسين المعتمدين هنا قريبًا.</p>@endforelse</div></div></section></main>
+@endsection
