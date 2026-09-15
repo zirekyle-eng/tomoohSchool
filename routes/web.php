@@ -54,8 +54,8 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/admin/notifications', [AdminNotificationsController::class, 'index'])->middleware('role:admin')->name('admin.notifications');
     Route::post('/admin/notifications/read', [AdminNotificationsController::class, 'read'])->middleware('role:admin')->name('admin.notifications.read');
     Route::get('/admin/applications', [AdminApplicationsController::class, 'index'])->middleware('role:admin')->name('admin.applications');
-    Route::post('/admin/applications/{id}/approve', [AdminApplicationsController::class, 'approve'])->middleware('role:admin')->name('admin.applications.approve');
-    Route::post('/admin/applications/{id}/reject', [AdminApplicationsController::class, 'reject'])->middleware('role:admin')->name('admin.applications.reject');
+    // Route::post('/admin/applications/{id}/approve', [AdminApplicationsController::class, 'approve'])->middleware('role:admin')->name('admin.applications.approve');
+    // Route::post('/admin/applications/{id}/reject', [AdminApplicationsController::class, 'reject'])->middleware('role:admin')->name('admin.applications.reject');
     Route::get('/admin/schedule', [AdminController::class, 'schedule'])->middleware('role:admin')->name('admin.schedule');
     Route::post('/admin/schedule', [AdminController::class, 'storeSchedule'])->middleware('role:admin')->name('admin.schedule.store');
     Route::post('/admin/schedule/{id}/toggle', [AdminController::class, 'toggleSchedule'])->middleware('role:admin')->name('admin.schedule.toggle');

@@ -148,12 +148,29 @@ class PublicController extends Controller
             'specialization' => ['required', 'string', 'max:180'],
             'qualifications' => ['required', 'string', 'max:2000'],
             'years_experience' => ['nullable', 'integer', 'min:0', 'max:60'],
-            'bio' => ['nullable', 'string', 'max:3000'],
-            'verification_source' => ['nullable', 'string', 'max:500'],
+            'notes' => ['nullable', 'string', 'max:3000'],
+            'teaching_subjects' => ['required', 'string', 'max:500'],
+            'cv_file' => ['nullable', 'file', 'mimes:pdf,doc,docx,txt,rtf,odt', 'max:5120'],
         ]);
-        $data['status'] = 'pending';
+
+        $cvPath = null;
+        if ($request->hasFile('cv_file')) {
+            $directory = public_path('uploads/teachers');
+            if (! is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
+            $extension = $request->file('cv_file')->extension();
+            $filename = 'teacher_cv_' . bin2hex(random_bytes(10)) . '.' . $extension;
+            $request->file('cv_file')->move($directory, $filename);
+            $cvPath = 'uploads/teachers/' . $filename;
+        }
+
+        unset($data['cv_file']);
+        $data['cv_link'] = $cvPath;
+        $data['status'] = 'new';
         $data['created_at'] = now();
-        $data['updated_at'] = now();
+        // $data['updated_at'] = now();
         DB::table('teacher_applications')->insert($data);
 
         return redirect()->route('teacher.apply')->with('success', 'تم إرسال طلبك بنجاح. ستتم مراجعته من الإدارة.');

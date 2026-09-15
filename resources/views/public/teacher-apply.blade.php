@@ -57,20 +57,148 @@
                 <h2>طلب الانضمام كمدرس</h2>
                 <p>أرسل بياناتك، وسيتواصل معك فريق الإدارة بعد المراجعة.</p>
                 @if(session('success'))<p class="apply-alert">{{ session('success') }}</p>@endif
-                <form method="post" action="{{ route('teacher.apply.store') }}">
-                    @csrf
-                    <div class="apply-fields">
-                        <label>الاسم الكامل<input name="full_name" value="{{ old('full_name') }}" required></label>
-                        <label>رقم الهاتف<input name="phone" value="{{ old('phone') }}" required></label>
-                        <label>البريد الإلكتروني<input name="email" type="email" value="{{ old('email') }}"></label>
-                        <label>التخصص<input name="specialization" value="{{ old('specialization') }}" required></label>
-                        <label>سنوات الخبرة<input name="years_experience" type="number" min="0" value="{{ old('years_experience') }}"></label>
-                        <label class="wide">المؤهلات<input name="qualifications" value="{{ old('qualifications') }}" required></label>
-                        <label class="wide">نبذة تعريفية<textarea name="bio">{{ old('bio') }}</textarea></label>
-                        <label class="wide">مصدر التحقق أو رابط الأعمال<input name="verification_source" value="{{ old('verification_source') }}"></label>
-                        <button class="button apply-submit wide" type="submit">إرسال طلب الانضمام</button>
-                    </div>
-                </form>
+
+            <form
+                method="post"
+                action="{{ route('teacher.apply.store') }}"
+                enctype="multipart/form-data"
+            >
+
+                @csrf
+
+                <div class="apply-fields">
+
+
+                    <label>
+
+                        الاسم الكامل
+
+                        <input
+                            name="full_name"
+                            value="{{ old('full_name') }}"
+                            required
+                        >
+
+                    </label>
+
+
+                    <label>
+
+                        رقم الهاتف
+
+                        <input
+                            name="phone"
+                            value="{{ old('phone') }}"
+                            required
+                        >
+
+                    </label>
+
+
+                    <label>
+
+                        البريد الإلكتروني
+
+                        <input
+                            name="email"
+                            type="email"
+                            value="{{ old('email') }}"
+                        >
+
+                    </label>
+
+
+                    <label>
+
+                        التخصص
+
+                        <input
+                            name="specialization"
+                            value="{{ old('specialization') }}"
+                            required
+                        >
+
+                    </label>
+
+
+                    <label>
+
+                        سنوات الخبرة
+
+                        <input
+                            name="years_experience"
+                            type="number"
+                            min="0"
+                            value="{{ old('years_experience') }}"
+                        >
+
+                    </label>
+
+
+                    <label class="wide">
+
+                        المؤهلات
+
+                        <input
+                            name="qualifications"
+                            value="{{ old('qualifications') }}"
+                            required
+                        >
+
+                    </label>
+
+
+                    <label class="wide">
+
+                        المواد والصفوف التي يمكنك تدريسها
+
+                        <textarea
+                            name="teaching_subjects"
+                            required
+                        >{{ old('teaching_subjects') }}</textarea>
+
+                    </label>
+
+
+                    <label class="wide">
+
+                        ملاحظات إضافية
+                        <span style="font-weight:500;color:#736686;">
+                            (اختياري)
+                        </span>
+
+                        <textarea
+                            name="notes"
+                        >{{ old('notes') }}</textarea>
+
+                    </label>
+
+
+                    <label class="wide">
+
+                        رفع السيرة الذاتية
+                        <span style="font-weight:500;color:#736686;">
+                            (اختياري)
+                        </span>
+
+                        <input
+                            name="cv_file"
+                            type="file"
+                            accept=".pdf,.doc,.docx,.txt,.rtf,.odt"
+                        >
+                    </label>
+
+                    <button
+                        class="button apply-submit wide"
+                        type="submit"
+                    >
+                        إرسال طلب الانضمام
+                    </button>
+
+
+                </div>
+
+            </form>
             </section>
         </div>
     </main>

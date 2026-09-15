@@ -215,8 +215,9 @@ class AdminController extends Controller
             ->leftJoin('teachers_profiles as tp', 'tp.user_id', '=', 'u.id')
             ->where('u.role', 'teacher')
             ->orderByDesc('u.created_at')
-            ->select('u.id', 'u.full_name', 'u.phone', 'u.email', 'u.status', 'tp.specialization', 'tp.years_experience', 'tp.bio', 'tp.photo_path')
-            ->get();
+            ->select('u.id', 'u.full_name', 'u.phone', 'u.email', 'u.status', 'tp.specialization', 'tp.years_experience', 'tp.bio', 'tp.photo_path', 'tp.qualifications', 'tp.cv_path')
+             ->get();
+            //  dd($teachers);
 
         return view('admin.teachers', compact('teachers'));
     }
@@ -229,9 +230,11 @@ class AdminController extends Controller
             'email' => ['nullable', 'email', 'max:160'],
             'specialization' => ['nullable', 'string', 'max:180'],
             'years_experience' => ['nullable', 'integer', 'min:0', 'max:60'],
+            'qualifications' => ['nullable', 'string'],
             'bio' => ['nullable', 'string'],
             'password' => ['required', 'string', 'min:8', 'regex:/[A-Z]/', 'regex:/[^a-zA-Z0-9]/'],
             'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
+            'cv_file' => ['nullable', 'file', 'mimes:pdf,doc,docx,txt,rtf,odt', 'max:5120'],
         ]);
 
         $photoPath = null;
@@ -245,33 +248,38 @@ class AdminController extends Controller
             $photoPath = 'public/uploads/teachers/'.$filename;
         }
 
-        DB::transaction(function () use ($data, $photoPath): void {
+        $cvPath = null;
+        if ($request->hasFile('cv_file')) {
+            $directory = public_path('uploads/teachers');
+            if (! is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+            $filename = 'teacher_cv_'.bin2hex(random_bytes(10)).'.'.$request->file('cv_file')->extension();
+            $request->file('cv_file')->move($directory, $filename);
+            $cvPath = 'public/uploads/teachers/'.$filename;
+        }
+
+        DB::transaction(function () use ($data, $photoPath, $cvPath): void {
             $teacherId = DB::table('users')->insertGetId([
                 'full_name' => $data['full_name'], 'phone' => $data['phone'], 'email' => $data['email'] ?? null,
+                'market_id' => 3,
                 'password_hash' => Hash::make($data['password']), 'role' => 'teacher', 'status' => 'active',
                 'created_at' => now(), 'updated_at' => now(),
             ]);
             DB::table('teachers_profiles')->insert([
                 'user_id' => $teacherId, 'specialization' => $data['specialization'] ?? null,
-                'years_experience' => $data['years_experience'] ?? 0, 'bio' => $data['bio'] ?? null,
-                'photo_path' => $photoPath,
+                'years_experience' => $data['years_experience'] ?? 0, 'qualifications' => $data['qualifications'] ?? null,
+                'bio' => $data['bio'] ?? null, 'photo_path' => $photoPath, 'cv_path' => $cvPath,
+
             ]);
         });
-
-        $message = 'تمت إضافة المدرس بنجاح.';
-        try {
-            $moodle->createUser($data['full_name'], $data['phone'], $data['password'], 'teacher');
-        } catch (\Throwable $exception) {
-            $message .= ' تعذر إنشاء حساب المدرس في Moodle: '.$exception->getMessage();
-        }
-
-        return back()->with('success', $message);
-    }
-
+        return back()->with('success', 'تم حفظ المدرس بنجاح');
+}
     public function updateTeacher(Request $request, int $id): RedirectResponse
     {
         $teacher = DB::table('users')->where('id', $id)->where('role', 'teacher')->first();
         abort_unless($teacher, 404);
+
 
         $data = $request->validate([
             'full_name' => ['required', 'string', 'max:160'],
@@ -279,10 +287,12 @@ class AdminController extends Controller
             'email' => ['nullable', 'email', 'max:160'],
             'specialization' => ['nullable', 'string', 'max:180'],
             'years_experience' => ['nullable', 'integer', 'min:0', 'max:60'],
+            'qualifications' => ['nullable', 'string'],
             'bio' => ['nullable', 'string'],
-            'status' => ['required', 'in:active,inactive'],
+            'status' => ['required', 'in:active,suspended'],
             'password' => ['nullable', 'string', 'min:8', 'regex:/[A-Z]/', 'regex:/[^a-zA-Z0-9]/'],
             'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
+            'cv_file' => ['nullable', 'file', 'mimes:pdf,doc,docx,txt,rtf,odt', 'max:5120'],
         ]);
 
         $photoPath = null;
@@ -296,7 +306,18 @@ class AdminController extends Controller
             $photoPath = 'public/uploads/teachers/'.$filename;
         }
 
-        DB::transaction(function () use ($id, $data, $photoPath): void {
+        $cvPath = null;
+        if ($request->hasFile('cv_file')) {
+            $directory = public_path('uploads/teachers');
+            if (! is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+            $filename = 'teacher_cv_'.$id.'_'.bin2hex(random_bytes(8)).'.'.$request->file('cv_file')->extension();
+            $request->file('cv_file')->move($directory, $filename);
+            $cvPath = 'public/uploads/teachers/'.$filename;
+        }
+
+        DB::transaction(function () use ($id, $data, $photoPath, $cvPath): void {
             $userData = [
                 'full_name' => $data['full_name'],
                 'phone' => $data['phone'],
@@ -310,10 +331,14 @@ class AdminController extends Controller
             $profile = [
                 'specialization' => $data['specialization'] ?? null,
                 'years_experience' => $data['years_experience'] ?? 0,
+                'qualifications' => $data['qualifications'] ?? null,
                 'bio' => $data['bio'] ?? null,
             ];
             if ($photoPath !== null) {
                 $profile['photo_path'] = $photoPath;
+            }
+            if ($cvPath !== null) {
+                $profile['cv_path'] = $cvPath;
             }
             DB::table('teachers_profiles')->updateOrInsert(['user_id' => $id], $profile);
         });

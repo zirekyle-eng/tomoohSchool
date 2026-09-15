@@ -104,7 +104,7 @@
         <div class="subjects-list">
             @forelse($subjects as $subject)
                 <article class="subject-card">
-                    @if($subject->image_path)<img class="subject-image" src="{{ asset($subject->image_path) }}" alt="{{ $subject->name }}">@else<div class="subject-image"></div>@endif
+                    @if($subject->image_path)<img class="subject-image" src="{{ asset(str_replace('public/', '', $subject->image_path)) }}" alt="{{ $subject->name }}">@else<div class="subject-image"></div>@endif
                     <div>
                         <h3>{{ $subject->name }}</h3>
                         <p>{{ $subject->description ?: 'لا يوجد وصف مختصر لهذه المادة.' }}</p>

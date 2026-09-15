@@ -58,8 +58,8 @@
                 <div>
                     <h2>{{ $teacher->full_name }}</h2>
                     <p class="teacher-specialization">{{ $teacher->specialization ?: 'مدرس معتمد' }}</p>
-                    <span class="teacher-status {{ $teacher->status === 'active' ? 'active' : 'inactive' }}">{{ $teacher->status === 'active' ? 'نشط' : 'غير نشط' }}</span>
-                </div>
+                    <span class="teacher-status {{ $teacher->status === 'active' ? 'active' : 'inactive' }}">{{ $teacher->status === 'active' ? 'نشط' : 'موقوف' }}</span>
+                       </div>
             </div>
             <div class="teacher-info">
                 <span>☎ {{ $teacher->phone ?: 'لا يوجد هاتف' }}</span>
@@ -86,9 +86,11 @@
             <label>البريد الإلكتروني<input name="email" type="email"></label>
             <label>التخصص<input name="specialization"></label>
             <label>سنوات الخبرة<input name="years_experience" type="number" min="0" max="60"></label>
-            <label>الحالة<select name="status"><option value="active">نشط</option><option value="inactive">غير نشط</option></select></label>
+            <label>الحالة<select name="status"><option value="active">نشط</option><option value="suspended">موقوف</option></select></label>
             <label>الصورة<input name="photo" type="file" accept="image/jpeg,image/png,image/webp"></label>
+            <label>السيرة الذاتية (CV)<input name="cv_file" type="file" accept=".pdf,.doc,.docx,.txt,.rtf,.odt"><small style="color:var(--muted);font-weight:500" id="cv-note"></small></label>
             <label class="wide">كلمة السر الجديدة<input name="password" type="password" minlength="8" autocomplete="new-password"><small style="color:var(--muted);font-weight:500" id="password-note">اتركها فارغة للإبقاء على كلمة السر الحالية.</small></label>
+            <label class="wide">المؤهلات العلمية<textarea name="qualifications" placeholder="مثال: بكالوريوس رياضيات - جامعة بيرزيت"></textarea></label>
             <label class="wide">نبذة تعريفية<textarea name="bio"></textarea></label>
             <div class="modal-actions">
                 <button class="button" type="submit">حفظ التعديلات</button>
@@ -105,10 +107,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const modalTitle = document.querySelector('#teacher-modal-title');
     const password = form.elements.password;
     const passwordNote = document.querySelector('#password-note');
+    const cvNote = document.querySelector('#cv-note');
     const closeButtons = modal ? modal.querySelectorAll('.close-modal, .cancel-modal') : [];
     function closeModal() { modal.classList.remove('open'); }
     document.querySelectorAll('.edit-teacher').forEach(function (button) {
         button.addEventListener('click', function () {
+
             const teacher = JSON.parse(button.dataset.teacher);
             form.action = '{{ url('/admin/teachers') }}/' + teacher.id;
             modalTitle.textContent = 'تعديل بيانات المدرس';
@@ -119,9 +123,13 @@ document.addEventListener('DOMContentLoaded', function () {
             form.elements.email.value = teacher.email || '';
             form.elements.specialization.value = teacher.specialization || '';
             form.elements.years_experience.value = teacher.years_experience || 0;
-            form.elements.status.value = teacher.status || 'active';
+            form.elements.status.value = teacher.status === 'suspended' ? 'suspended' : 'active';
             form.elements.password.value = '';
+            form.elements.qualifications.value = teacher.qualifications || '';
             form.elements.bio.value = teacher.bio || '';
+            cvNote.innerHTML = teacher.cv_path
+                ? 'الملف الحالي: <a href="' + '{{ url('/') }}/' + teacher.cv_path.replace('public/', '') + '" target="_blank" rel="noopener">فتح السيرة الذاتية</a> — ارفع ملفًا جديدًا لاستبداله.'
+                : 'لا يوجد ملف مرفوع حاليًا.';
             modal.classList.add('open');
             form.elements.full_name.focus();
         });
@@ -133,6 +141,7 @@ document.addEventListener('DOMContentLoaded', function () {
         form.elements.status.value = 'active';
         password.required = true;
         passwordNote.textContent = 'يجب أن تحتوي على 8 أحرف وحرف كبير ورمز خاص.';
+        cvNote.textContent = '';
         modal.classList.add('open');
         form.elements.full_name.focus();
     });

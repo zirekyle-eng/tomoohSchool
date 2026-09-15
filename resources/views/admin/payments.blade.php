@@ -71,8 +71,8 @@
     @forelse($payments as $payment)
         <article class="payment-row">
             @if($payment->receipt_path)
-                <a href="{{ asset($payment->receipt_path) }}" target="_blank" rel="noopener">
-                    <img class="receipt" src="{{ asset($payment->receipt_path) }}" alt="إشعار الدفع">
+                <a href="{{ asset(str_replace('public/', '', $payment->receipt_path)) }}" target="_blank" rel="noopener">
+                    <img class="receipt" src="{{ asset(str_replace('public/', '', $payment->receipt_path)) }}" alt="إشعار الدفع">
                 </a>
             @else
                 <div class="receipt-empty">بدون إيصال</div>

@@ -53,15 +53,27 @@ class AdminAcademicsController extends Controller
             'image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:4096'],
         ]);
 
+        // $imagePath = null;
+        // if ($request->hasFile('image')) {
+        //     $imagePath = $request->file('image')->store('uploads/subjects', 'public');
+        // }
+
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('uploads/subjects', 'public');
+            $directory = public_path('uploads/subjects');
+            if (! is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+            $filename = 'subject_'.bin2hex(random_bytes(8)).'.'.$request->file('image')->extension();
+            $request->file('image')->move($directory, $filename);
+            $imagePath = 'public/uploads/subjects/'.$filename;
         }
 
         DB::table('subjects')->insert([
             'grade_id' => $data['grade_id'], 'market_id' => $data['market_id'], 'name' => $data['name'],
             'description' => $data['description'] ?? null, 'monthly_fee' => $data['monthly_fee'] ?? 0,
-            'image_path' => $imagePath ? 'storage/'.$imagePath : null,
+
+            'image_path' => $imagePath ? 'public/' . $imagePath : null,
             'status' => 'active', 'tawjihi_branch' => $data['tawjihi_branch'], 'enrollment_term' => $data['enrollment_term'],
             'sessions_per_week' => $data['sessions_per_week'], 'total_hours' => $data['total_hours'] ?? null,
             'start_date' => $data['start_date'] ?? null, 'end_date' => $data['end_date'] ?? null,
