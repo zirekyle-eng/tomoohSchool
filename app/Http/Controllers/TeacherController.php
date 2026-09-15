@@ -27,21 +27,26 @@ class TeacherController extends Controller
     public function updateProfile(Request $request): RedirectResponse
     {
         $teacher = $request->user();
-        $data = $request->validate(['full_name' => ['required', 'string', 'max:160'], 'phone' => ['required', 'string', 'max:30', 'unique:users,phone,' . $teacher->id], 'specialization' => ['nullable', 'string', 'max:180'], 'years_experience' => ['nullable', 'integer', 'min:0', 'max:60'], 'bio' => ['nullable', 'string'], 'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072']]);
+        $data = $request->validate(['full_name' => ['required', 'string', 'max:160'], 'phone' => ['required', 'string', 'max:30', 'unique:users,phone,'.$teacher->id], 'specialization' => ['nullable', 'string', 'max:180'], 'years_experience' => ['nullable', 'integer', 'min:0', 'max:60'], 'bio' => ['nullable', 'string'], 'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072']]);
         $photoPath = null;
         if ($request->hasFile('photo')) {
             $directory = public_path('uploads/teachers');
-            if (!is_dir($directory)) mkdir($directory, 0755, true);
-            $filename = 'teacher_' . $teacher->id . '_' . bin2hex(random_bytes(6)) . '.' . $request->file('photo')->extension();
+            if (! is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+            $filename = 'teacher_'.$teacher->id.'_'.bin2hex(random_bytes(6)).'.'.$request->file('photo')->extension();
             $request->file('photo')->move($directory, $filename);
-            $photoPath = 'public/uploads/teachers/' . $filename;
+            $photoPath = 'public/uploads/teachers/'.$filename;
         }
         DB::transaction(function () use ($teacher, $data, $photoPath): void {
             DB::table('users')->where('id', $teacher->id)->update(['full_name' => $data['full_name'], 'phone' => $data['phone']]);
             $profile = ['specialization' => $data['specialization'] ?? null, 'years_experience' => $data['years_experience'] ?? 0, 'bio' => $data['bio'] ?? null];
-            if ($photoPath !== null) $profile['photo_path'] = $photoPath;
+            if ($photoPath !== null) {
+                $profile['photo_path'] = $photoPath;
+            }
             DB::table('teachers_profiles')->updateOrInsert(['user_id' => $teacher->id], $profile);
         });
+
         return back()->with('success', 'تم حفظ تعديلات الملف الشخصي.');
     }
 }

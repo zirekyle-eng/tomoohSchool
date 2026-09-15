@@ -1,100 +1,91 @@
 @extends('layouts.public', ['title' => $teacher->full_name . ' | مدرسونا'])
 @section('content')
 <style>
-    .teacher-page{background:#fbf9fd;min-height:calc(100vh - 72px);padding-bottom:86px}
-    .teacher-hero{position:relative;overflow:hidden;min-height:250px;padding:48px 20px 88px;background:linear-gradient(115deg,#291541 0%,#432568 58%,#56377d 100%);color:#fff;text-align:center}
-    .teacher-hero:before,.teacher-hero:after{content:'';position:absolute;border-radius:50%;background:#ffc857;opacity:.08;pointer-events:none}
-    .teacher-hero:before{width:280px;height:280px;left:-100px;top:-170px}
-    .teacher-hero:after{width:230px;height:230px;right:-80px;bottom:-155px}
-    .teacher-hero>*{position:relative;z-index:1}
-    .teacher-hero .eyebrow{background:#ffffff18;border:1px solid #ffffff14;color:#ffc857;padding:7px 16px}
-    .teacher-hero h1{margin:16px auto 7px;color:#fff;font-size:clamp(30px,4.5vw,45px);line-height:1.35}
-    .teacher-hero p{margin:0;color:#e8dff0;font-size:13px}
-    .teacher-panel{width:min(1000px,calc(100% - 64px));margin:-30px auto 0;padding:28px;position:relative;z-index:2;border:1px solid #eadfeb;border-radius:22px;background:#fff;box-shadow:0 18px 45px rgba(41,21,65,.1)}
-    .teacher-back{display:inline-block;margin-bottom:18px;color:var(--coral);font-size:12px;font-weight:800}
-    .teacher-profile{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:18px;padding-bottom:23px;border-bottom:1px solid #f1e9ef}
-    .teacher-avatar-large{width:90px;height:90px;display:grid;place-items:center;overflow:hidden;border-radius:24px 24px 7px 24px;background:linear-gradient(135deg,var(--plum),#59369b);color:#fff;font-size:36px;font-weight:800;box-shadow:7px 7px 0 #ffc857}
-    .teacher-avatar-large img{width:100%;height:100%;object-fit:cover}
-    .teacher-profile h2{margin:0;color:var(--plum);font-size:26px}
-    .teacher-profile .specialization{margin:4px 0 0;color:var(--coral);font-size:12px;font-weight:800}
-    .teacher-stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-    .teacher-stats span{padding:6px 10px;border-radius:999px;background:#f8f0fb;color:var(--muted);font-size:10px}
-    .teacher-contact{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}
-    .teacher-contact span{padding:6px 10px;border-radius:999px;background:#fff7df;color:#755c18;font-size:10px}
-    .teacher-content{display:grid;grid-template-columns:1fr 1.2fr;gap:26px;padding-top:25px}
-    .teacher-content h3{margin:0 0 10px;color:var(--plum);font-size:19px}
-    .teacher-content p{margin:0;color:var(--muted);font-size:12px;line-height:2}
-    .teacher-qualifications{margin-top:22px}
-    .teacher-subjects{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-    .teacher-subject{display:flex;align-items:center;gap:10px;padding:13px;border:1px solid var(--line);border-radius:13px;background:#fff}
-    .teacher-subject-icon{width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:#ffeadf;color:var(--coral);font-size:15px}
-    .teacher-subject strong{display:block;color:var(--ink);font-size:12px}
-    .teacher-subject small{display:block;margin-top:2px;color:var(--muted);font-size:10px}
-    .teacher-empty{grid-column:1/-1;padding:22px;text-align:center;color:var(--muted);border:1px dashed #d9c9df;border-radius:14px;font-size:12px}
-    @media(max-width:700px){.teacher-panel{width:min(100% - 20px,600px);padding:19px 16px 24px;border-radius:20px}.teacher-profile{grid-template-columns:1fr;text-align:center}.teacher-avatar-large{margin:auto}.teacher-stats{justify-content:center}.teacher-content{grid-template-columns:1fr;gap:22px}.teacher-subjects{grid-template-columns:1fr}.teacher-hero{min-height:235px;padding:40px 18px 80px}.teacher-hero h1{font-size:30px}}
+    .teacher-profile-page{background:#f8f5f1;min-height:calc(100vh - 72px);padding:34px 0 90px;color:#261735}
+    .teacher-profile-wrap{width:min(1120px,calc(100% - 36px));margin:auto}
+    .teacher-profile-back{display:inline-flex;align-items:center;gap:8px;margin-bottom:26px;color:#76677d;font-size:12px;font-weight:700;transition:color .2s ease}
+    .teacher-profile-back:hover{color:var(--coral)}
+    .teacher-profile-hero{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);overflow:hidden;min-height:360px;border-radius:28px;background:#2b1749;color:#fff;box-shadow:0 22px 48px rgba(43,23,73,.16)}
+    .teacher-profile-intro{position:relative;display:flex;flex-direction:column;justify-content:center;padding:54px 58px;isolation:isolate}
+    .teacher-profile-intro:before{content:'';position:absolute;z-index:-1;width:390px;height:390px;right:-170px;bottom:-245px;border:1px solid rgba(255,200,87,.28);border-radius:50%;box-shadow:0 0 0 30px rgba(255,200,87,.04),0 0 0 60px rgba(255,200,87,.03)}
+    .teacher-profile-kicker{display:inline-flex;width:max-content;padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:99px;color:#ffd779;font-size:10px;font-weight:800;letter-spacing:.2px}
+    .teacher-profile-intro h1{max-width:610px;margin:19px 0 8px;color:#fff;font-size:clamp(32px,5vw,58px);line-height:1.25}
+    .teacher-profile-role{margin:0;color:#dccfe8;font-size:14px}
+    .teacher-profile-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+    .teacher-profile-meta span{padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.1);color:#f7edf9;font-size:11px}
+    .teacher-profile-meta strong{color:#ffd779;font-size:16px;margin-left:3px}
+    .teacher-profile-photo{position:relative;display:flex;align-items:center;justify-content:center;padding:42px;background:#f1e7df}
+    .teacher-profile-photo:before{content:'';position:absolute;inset:24px;border:1px solid #ddcdbf;border-radius:50% 50% 14px 50%;transform:rotate(-7deg)}
+    .teacher-profile-photo img,.teacher-profile-photo-placeholder{position:relative;width:min(100%,220px);aspect-ratio:1;display:grid;place-items:center;object-fit:cover;border:9px solid #fff;border-radius:50% 50% 16px 50%;box-shadow:0 16px 30px rgba(43,23,73,.18)}
+    .teacher-profile-photo-placeholder{background:var(--coral);color:#fff;font-size:62px;font-weight:800}
+    .teacher-profile-body{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(260px,.85fr);gap:20px;margin-top:20px}
+    .teacher-profile-section{padding:28px;border:1px solid #e7ddd5;border-radius:20px;background:#fff;box-shadow:0 9px 22px rgba(43,23,73,.04)}
+    .teacher-profile-section-heading{display:flex;align-items:center;gap:12px;margin:0 0 17px;color:#2b1749;font-size:20px}
+    .teacher-profile-section-heading:before{content:'';width:5px;height:23px;border-radius:5px;background:var(--coral)}
+    .teacher-profile-section p{margin:0;color:#76677d;font-size:13px;line-height:2.1}
+    .teacher-profile-qualification{margin-top:24px;padding-top:21px;border-top:1px solid #eee6df}
+    .teacher-profile-qualification h3{margin:0 0 8px;color:#2b1749;font-size:14px}
+    .teacher-subject-list{display:grid;gap:11px}
+    .teacher-subject-row{display:flex;align-items:center;gap:13px;padding:13px 14px;border:1px solid #eee5de;border-radius:14px;background:#fffaf7;transition:transform .2s ease,border-color .2s ease}
+    .teacher-subject-row:hover{transform:translateX(-3px);border-color:#efb8aa}
+    .teacher-subject-icon{width:38px;height:38px;display:grid;place-items:center;flex:0 0 auto;border-radius:11px;background:#ffe9df;color:var(--coral);font-size:17px}
+    .teacher-subject-row strong{display:block;color:#2b1749;font-size:13px}
+    .teacher-subject-row small{display:block;margin-top:2px;color:#8a7b8f;font-size:10px}
+    .teacher-subject-empty{padding:22px;text-align:center;color:#8a7b8f;border:1px dashed #daccc2;border-radius:14px;font-size:12px}
+    @media(max-width:760px){.teacher-profile-page{padding-top:22px}.teacher-profile-wrap{width:min(100% - 22px,600px)}.teacher-profile-hero{grid-template-columns:1fr;min-height:0}.teacher-profile-photo{order:-1;padding:32px}.teacher-profile-photo:before{inset:18px}.teacher-profile-photo img,.teacher-profile-photo-placeholder{width:150px}.teacher-profile-photo-placeholder{font-size:45px}.teacher-profile-intro{padding:34px 25px 38px}.teacher-profile-intro h1{font-size:35px}.teacher-profile-meta{margin-top:20px}.teacher-profile-body{grid-template-columns:1fr}.teacher-profile-section{padding:22px 19px}}
 </style>
 
-<div class="teacher-page">
-    <section class="teacher-hero">
-        <span class="eyebrow">ملف المدرس</span>
-        <h1>{{ $teacher->full_name }}</h1>
-        <p>{{ $teacher->specialization ?: 'مدرس معتمد في مدرسة طموح الإلكترونية' }}</p>
-    </section>
+<div class="teacher-profile-page">
+    <div class="teacher-profile-wrap">
+        <a class="teacher-profile-back" href="{{ route('teachers') }}"><span aria-hidden="true">→</span> العودة إلى قائمة المدرسين</a>
 
-    <main class="teacher-panel">
-        <a class="teacher-back" href="{{ route('teachers') }}">→ العودة إلى المدرسين</a>
-
-        <header class="teacher-profile">
-            <div class="teacher-avatar-large">
-                @if($teacher->photo_path)
-                    <img src="{{ asset(str_replace('public/', '', $teacher->photo_path)) }}" alt="{{ $teacher->full_name }}">
-                @else
-                    {{ mb_substr($teacher->full_name, 0, 1) }}
-                @endif
+        <header class="teacher-profile-hero">
+            <div class="teacher-profile-intro">
+                <span class="teacher-profile-kicker">مدرس معتمد في مدرسة طموح</span>
+                <h1>{{ $teacher->full_name }}</h1>
+                <p class="teacher-profile-role">{{ $teacher->specialization ?: 'مدرس متخصص لمتابعة الطلاب وتبسيط المادة التعليمية.' }}</p>
+                <div class="teacher-profile-meta">
+                    <span><strong>{{ (int)($teacher->years_experience ?? 0) }}</strong> سنوات خبرة</span>
+                    <span><strong>{{ $subjects->count() }}</strong> مواد دراسية</span>
+                    @if($teacher->phone)<span>{{ $teacher->phone }} ☎</span>@endif
+                </div>
             </div>
-            <div>
-                <h2>{{ $teacher->full_name }}</h2>
-                <p class="specialization">{{ $teacher->specialization ?: 'مدرس معتمد' }}</p>
-                <div class="teacher-stats">
-                    <span>{{ (int)($teacher->years_experience ?? 0) }} سنوات خبرة</span>
-                    <span>{{ $subjects->count() }} مواد يدرسها</span>
-                </div>
-                <div class="teacher-contact">
-                    @if($teacher->phone)<span>☎ {{ $teacher->phone }}</span>@endif
-                    <span>● مدرس نشط</span>
-                </div>
+            <div class="teacher-profile-photo">
+                @if($teacher->photo_path)
+                    <img src="{{ asset(str_replace('public/', '', $teacher->photo_path)) }}" alt="صورة {{ $teacher->full_name }}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+                    <span class="teacher-profile-photo-placeholder" style="display:none">{{ mb_substr($teacher->full_name, 0, 1) }}</span>
+                @else
+                    <span class="teacher-profile-photo-placeholder">{{ mb_substr($teacher->full_name, 0, 1) }}</span>
+                @endif
             </div>
         </header>
 
-        <div class="teacher-content">
-            <section>
-                <h3>نبذة عن المدرس</h3>
+        <div class="teacher-profile-body">
+            <section class="teacher-profile-section">
+                <h2 class="teacher-profile-section-heading">نبذة عن المدرس</h2>
                 <p>{{ $teacher->bio ?: 'مدرس متخصص لمتابعة الطلاب وتبسيط المادة التعليمية.' }}</p>
                 @if($teacher->qualifications)
-                    <div class="teacher-qualifications">
-                        <h3>المؤهلات</h3>
+                    <div class="teacher-profile-qualification">
+                        <h3>المؤهلات والخبرة</h3>
                         <p>{{ $teacher->qualifications }}</p>
                     </div>
                 @endif
             </section>
 
-            <section>
-                <h3>المواد التي يدرسها</h3>
-                <div class="teacher-subjects">
+            <section class="teacher-profile-section">
+                <h2 class="teacher-profile-section-heading">المواد التي يدرسها</h2>
+                <div class="teacher-subject-list">
                     @forelse($subjects as $subject)
-                        <div class="teacher-subject">
-                            <span class="teacher-subject-icon">📚</span>
-                            <div>
-                                <strong>{{ $subject->name }}</strong>
-                                <small>{{ $subject->grade }}</small>
-                            </div>
+                        <div class="teacher-subject-row">
+                            <span class="teacher-subject-icon" aria-hidden="true">📚</span>
+                            <div><strong>{{ $subject->name }}</strong><small>{{ $subject->grade }}</small></div>
                         </div>
                     @empty
-                        <p class="teacher-empty">لا توجد مواد مرتبطة حاليًا.</p>
+                        <p class="teacher-subject-empty">لا توجد مواد مرتبطة حاليًا.</p>
                     @endforelse
                 </div>
             </section>
         </div>
-    </main>
+    </div>
 </div>
 @endsection

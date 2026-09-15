@@ -63,7 +63,7 @@
                 </label>
                 <button class="submit" type="submit">دخول إلى حسابي</button>
             </form>
-            <p class="auth-foot">ليس لديك حساب؟ <a href="{{ route('register') }}">أنشئ حساب طالب</a></p>
+            <p class="auth-foot">ليس لديك حساب؟ <a href="{{ route('contact') }}">تواصل مع الإدارة لتفعيل حسابك</a></p>
         </section>
     </section>
 </main>

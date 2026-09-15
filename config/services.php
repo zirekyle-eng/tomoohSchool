@@ -36,12 +36,12 @@ return [
     ],
 
     'bbb' => [
-        'base_url' => rtrim(env('BBB_SERVER_BASE_URL', ''), '/') . '/',
+        'base_url' => rtrim(env('BBB_SERVER_BASE_URL', ''), '/').'/',
         'secret' => env('BBB_SECRET'),
     ],
 
     'moodle' => [
-        'url' => rtrim(env('MOODLE_URL', ''), '/') . '/',
+        'url' => rtrim(env('MOODLE_URL', ''), '/').'/',
         'token' => env('MOODLE_TOKEN'),
         'service' => env('MOODLE_SERVICE', 'new'),
     ],

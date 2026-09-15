@@ -61,7 +61,7 @@ class AdminAcademicsController extends Controller
         DB::table('subjects')->insert([
             'grade_id' => $data['grade_id'], 'market_id' => $data['market_id'], 'name' => $data['name'],
             'description' => $data['description'] ?? null, 'monthly_fee' => $data['monthly_fee'] ?? 0,
-            'image_path' => $imagePath ? 'storage/' . $imagePath : null,
+            'image_path' => $imagePath ? 'storage/'.$imagePath : null,
             'status' => 'active', 'tawjihi_branch' => $data['tawjihi_branch'], 'enrollment_term' => $data['enrollment_term'],
             'sessions_per_week' => $data['sessions_per_week'], 'total_hours' => $data['total_hours'] ?? null,
             'start_date' => $data['start_date'] ?? null, 'end_date' => $data['end_date'] ?? null,

@@ -46,6 +46,7 @@ class AdminPaymentController extends Controller
                     'status' => 'rejected',
                     'reviewed_by' => $request->user()->id,
                 ]);
+
                 return;
             }
 

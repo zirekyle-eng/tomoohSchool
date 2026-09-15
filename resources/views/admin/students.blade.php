@@ -2,10 +2,41 @@
 
 @section('content')
 <style>
+    .student-create{margin-bottom:22px}.student-create h2{margin:0 0 5px}.student-create-intro{margin:0 0 18px;color:var(--muted);font-size:11px}.student-create-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.student-create-submit{align-self:end;border:0;border-radius:11px;background:var(--c);color:#fff;padding:12px;font:800 12px Tajawal;cursor:pointer}@media(max-width:800px){.student-create-form{grid-template-columns:1fr 1fr}}@media(max-width:560px){.student-create-form{grid-template-columns:1fr}}
     .enroll-head{display:flex;justify-content:space-between;align-items:end;gap:18px;margin-bottom:24px}.enroll-head h1{margin:0}.enroll-head p{margin:5px 0 0}.student-count{padding:9px 13px;border-radius:99px;background:#fff0eb;color:#d84e31;font-size:11px;font-weight:800}.enroll-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:22px;align-items:start}.enroll-form{display:grid;gap:16px}.field{display:grid;gap:7px;font-size:12px;font-weight:800}.field small{color:var(--muted);font-weight:500}.subjects-heading{display:flex;justify-content:space-between;align-items:center;gap:10px}.subjects-heading h2{margin:0}.subject-count{color:var(--muted);font-size:11px}.subjects-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.subject-option{display:flex;align-items:flex-start;gap:9px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;font-size:12px;font-weight:700}.subject-option:has(input:checked){border-color:var(--c);background:#fff6f2;box-shadow:0 4px 12px rgba(255,107,74,.1)}.subject-option input{margin-top:3px;accent-color:var(--c)}.subject-option span{display:grid;gap:3px}.subject-option small{color:var(--muted);font-size:10px;font-weight:500}.payment-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.save-enrollment{border:0;border-radius:12px;background:var(--c);color:#fff;padding:13px;font:800 13px Tajawal;cursor:pointer}.students-list{display:grid;gap:10px;max-height:650px;overflow:auto}.student-card{padding:14px;border:1px solid var(--line);border-radius:14px;background:#fff}.student-card strong{display:block;font-size:13px}.student-card span{display:block;margin-top:4px;color:var(--muted);font-size:11px}.student-status{display:inline-block!important;width:max-content;margin-top:8px!important;padding:3px 7px;border-radius:99px;background:#dcfce7;color:#166534!important;font-size:9px!important;font-weight:800}.student-status.off{background:#fee2e2;color:#b91c1c!important}.empty-state{color:var(--muted);font-size:12px}@media(max-width:1000px){.enroll-layout{grid-template-columns:1fr}}@media(max-width:620px){.enroll-head{display:block}.student-count{display:inline-block;margin-top:12px}.subjects-grid,.payment-fields{grid-template-columns:1fr}}
 </style>
 
-<header class="enroll-head"><div><h1>تسجيل طالب في مادة أو باقة</h1><p class="muted">اختر الطالب والمواد، ثم ارفع إشعار الدفع لاعتماد التسجيل مباشرة.</p></div><span class="student-count">{{ $students->count() }} طالب مسجل</span></header>
+<header class="enroll-head"><div><h1>تسجيل طالب في مادة أو باقة</h1><p class="muted">أضف الطالب أولًا، ثم سجله في المواد بعد اعتماد الدفع.</p></div><span class="student-count">{{ $students->count() }} طالب مسجل</span></header>
+
+<section class="panel student-create">
+    <h2>إضافة طالب جديد</h2>
+    <p class="student-create-intro">سيتم إنشاء حساب الطالب هنا ومزامنته تلقائيًا مع Moodle بنفس كلمة المرور.</p>
+    <form class="student-create-form" method="post" action="{{ route('admin.students.store') }}">
+        @csrf
+        <label class="field">الاسم الكامل<input name="full_name" value="{{ old('full_name') }}" required placeholder="اسم الطالب الكامل"></label>
+        <label class="field">رقم الجوال<input name="phone" type="tel" value="{{ old('phone') }}" required placeholder="رقم الجوال المستخدم في Moodle"></label>
+        <label class="field">البريد الإلكتروني <small>اختياري</small><input name="email" type="email" value="{{ old('email') }}" placeholder="student@example.com"></label>
+        <label class="field">كلمة المرور<input name="password" type="password" minlength="8" required placeholder="حرف كبير + رمز خاص"></label>
+        <label class="field">نوع الدراسة
+            <select id="student-mode" name="student_mode" required><option value="external" @selected(old('student_mode', 'external') === 'external')>مواد منفصلة</option><option value="regular" @selected(old('student_mode') === 'regular')>طالب نظامي</option></select>
+        </label>
+        <label class="field">الصف
+            <select name="grade_level" required>
+                <option value="">اختر الصف</option>
+                @foreach($grades as $grade)
+                    @php($gradeValue = preg_replace('/^الصف\s*/u', '', $grade->name) ?: $grade->name)
+                    <option value="{{ $gradeValue }}" @selected(old('grade_level') === $gradeValue)>{{ $grade->name }}</option>
+                @endforeach
+            </select>
+        </label>
+        <label class="field" id="student-branch-field">القسم
+            <select id="student-branch" name="branch"><option value="">اختر القسم</option><option value="general" @selected(old('branch') === 'general')>مشترك</option><option value="scientific" @selected(old('branch') === 'scientific')>علمي</option><option value="literary" @selected(old('branch') === 'literary')>أدبي</option></select>
+        </label>
+        <label class="field">الدولة <small>اختياري</small><input name="country" value="{{ old('country', 'فلسطين') }}" placeholder="الدولة"></label>
+        <label class="field">المدينة <small>اختياري</small><input name="city" value="{{ old('city') }}" placeholder="المدينة"></label>
+        <button class="student-create-submit" type="submit">إضافة الطالب ومزامنة Moodle</button>
+    </form>
+</section>
 
 <div class="enroll-layout">
     <section class="panel">
@@ -26,5 +57,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded',function(){const count=document.querySelector('#selected-count');const boxes=document.querySelectorAll('input[name="subject_ids[]"]');function update(){const selected=document.querySelectorAll('input[name="subject_ids[]"]:checked').length;count.textContent=selected+' مواد محددة'}boxes.forEach(function(box){box.addEventListener('change',update)})});
+document.addEventListener('DOMContentLoaded',function(){const mode=document.querySelector('#student-mode');const branch=document.querySelector('#student-branch');const branchField=document.querySelector('#student-branch-field');function toggleBranch(){const regular=mode.value==='regular';branchField.hidden=!regular;branch.required=regular;if(!regular){branch.value=''}}mode.addEventListener('change',toggleBranch);toggleBranch()});
 </script>
 @endsection

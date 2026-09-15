@@ -57,7 +57,7 @@
                     <form method="post" action="{{ route('logout') }}" style="margin:0">@csrf<button class="button logout-button" type="submit">تسجيل الخروج</button></form>
                 </div>
             @else
-                <a class="button ghost" href="{{ route('login') }}">تسجيل الدخول</a><a class="button" href="{{ route('register') }}">إنشاء حساب</a>
+                <a class="button ghost" href="{{ route('login') }}">تسجيل الدخول</a>
             @endauth
         </div>
         <button class="menu-button" type="button" aria-label="فتح القائمة" aria-expanded="false" aria-controls="main-menu">☰</button>

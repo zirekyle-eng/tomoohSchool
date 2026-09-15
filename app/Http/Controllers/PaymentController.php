@@ -50,12 +50,12 @@ class PaymentController extends Controller
         ]);
 
         $directory = public_path('uploads/receipts');
-        if (!is_dir($directory)) {
+        if (! is_dir($directory)) {
             mkdir($directory, 0755, true);
         }
 
         $extension = $request->file('receipt')->extension();
-        $filename = 'receipt_' . bin2hex(random_bytes(10)) . '.' . $extension;
+        $filename = 'receipt_'.bin2hex(random_bytes(10)).'.'.$extension;
         $request->file('receipt')->move($directory, $filename);
 
         DB::table('payments')->insert([
@@ -64,7 +64,7 @@ class PaymentController extends Controller
             'amount' => $enrollment->monthly_fee,
             'method' => $data['method'],
             'reference' => $data['reference'] ?? null,
-            'receipt_path' => 'public/uploads/receipts/' . $filename,
+            'receipt_path' => 'public/uploads/receipts/'.$filename,
             'status' => 'pending',
             'created_at' => now(),
         ]);

@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Services\MoodleService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class AdminApplicationsController extends Controller
 {
@@ -24,7 +24,7 @@ class AdminApplicationsController extends Controller
         abort_unless($application, 404);
         abort_if(DB::table('users')->where('phone', $application->phone)->exists(), 422, 'يوجد حساب بهذا الرقم مسبقًا.');
 
-        $temporaryPassword = 'Nukhba!' . Str::random(8);
+        $temporaryPassword = 'Nukhba!'.Str::random(8);
         DB::transaction(function () use ($application, $temporaryPassword): void {
             $teacherId = DB::table('users')->insertGetId([
                 'full_name' => $application->full_name,
@@ -46,11 +46,11 @@ class AdminApplicationsController extends Controller
             DB::table('teacher_applications')->where('id', $application->id)->update(['status' => 'approved', 'updated_at' => now()]);
         });
 
-        $message = 'تم قبول الطلب وإنشاء حساب المدرس. كلمة المرور المؤقتة: ' . $temporaryPassword;
+        $message = 'تم قبول الطلب وإنشاء حساب المدرس. كلمة المرور المؤقتة: '.$temporaryPassword;
         try {
             $moodle->createUser($application->full_name, $application->phone, $temporaryPassword, 'teacher');
         } catch (\Throwable $exception) {
-            $message .= ' تعذر إنشاء الحساب في Moodle: ' . $exception->getMessage();
+            $message .= ' تعذر إنشاء الحساب في Moodle: '.$exception->getMessage();
         }
 
         return back()->with('success', $message);

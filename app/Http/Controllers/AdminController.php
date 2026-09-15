@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Services\MoodleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class AdminController extends Controller
@@ -54,8 +56,95 @@ class AdminController extends Controller
             ->where('s.status', 'active')
             ->orderBy('g.sort_order')->orderBy('s.name')
             ->get(['s.id', 's.name', 's.monthly_fee', 's.grade_id', 'g.name as grade_name']);
+        $grades = DB::table('grades')->orderBy('sort_order')->orderBy('name')->get(['name']);
 
-        return view('admin.students', compact('students', 'enrollmentStudents', 'subjects'));
+        return view('admin.students', compact('students', 'enrollmentStudents', 'subjects', 'grades'));
+    }
+
+    public function storeStudent(Request $request, MoodleService $moodle): RedirectResponse
+    {
+        $data = $request->validate([
+            'full_name' => ['required', 'string', 'max:160'],
+            'phone' => ['required', 'string', 'max:30', 'unique:users,phone'],
+            'email' => ['nullable', 'email', 'max:160', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'regex:/[A-Z]/', 'regex:/[^a-zA-Z0-9]/'],
+            'country' => ['nullable', 'string', 'max:80'],
+            'city' => ['nullable', 'string', 'max:100'],
+            'student_mode' => ['required', 'in:regular,external'],
+            'grade_level' => [
+                'required',
+                'string',
+                Rule::in(DB::table('grades')->pluck('name')->map(
+                    fn (string $name): string => preg_replace('/^الصف\s*/u', '', $name) ?: $name
+                )->all()),
+            ],
+            'branch' => [
+                Rule::requiredIf(fn (): bool => $request->input('student_mode') === 'regular'),
+                'nullable',
+                'in:general,scientific,literary',
+            ],
+        ], [
+            'phone.unique' => 'رقم الجوال مستخدم مسبقًا.',
+            'email.unique' => 'البريد الإلكتروني مستخدم مسبقًا.',
+            'password.regex' => 'كلمة المرور يجب أن تحتوي حرفًا كبيرًا ورمزًا خاصًا.',
+        ]);
+
+        $student = DB::transaction(function () use ($data): User {
+            $student = User::create([
+                'full_name' => $data['full_name'],
+                'phone' => $data['phone'],
+                'email' => $data['email'] ?? null,
+                'password_hash' => Hash::make($data['password']),
+                'role' => 'student',
+                'status' => 'active',
+                'country' => $data['country'] ?? null,
+                'city' => $data['city'] ?? null,
+                'student_mode' => $data['student_mode'],
+                'grade_level' => $data['grade_level'] ?? null,
+                'branch' => $data['branch'] ?? null,
+                'market_id' => 1,
+            ]);
+
+            if ($student->student_mode === 'regular') {
+                $gradeId = DB::table('grades')->where('name', 'الصف '.$student->grade_level)->value('id');
+                $subjectIds = DB::table('subjects')
+                    ->where('grade_id', $gradeId)
+                    ->where('status', 'active')
+                    ->whereIn('tawjihi_branch', ['general', $student->branch])
+                    ->pluck('id');
+                $sectionId = DB::table('sections')
+                    ->where('grade_level', $student->grade_level)
+                    ->where('mode', 'regular')
+                    ->where('status', 'active')
+                    ->where(function ($query) use ($student): void {
+                        $query->where('branch', $student->branch)->orWhereNull('branch');
+                    })
+                    ->orderByRaw('branch IS NULL')
+                    ->value('id');
+
+                foreach ($subjectIds as $subjectId) {
+                    DB::table('enrollments')->insert([
+                        'student_id' => $student->id,
+                        'subject_id' => $subjectId,
+                        'section_id' => $sectionId,
+                        'enrollment_mode' => 'regular',
+                        'starts_on' => now()->toDateString(),
+                        'status' => 'active',
+                        'created_at' => now(),
+                    ]);
+                }
+            }
+
+            return $student;
+        });
+
+        try {
+            $moodleId = $moodle->createUser($student->full_name, $student->phone, $data['password'], 'student');
+        } catch (\Throwable $exception) {
+            return back()->withErrors(['student' => 'تم إنشاء الطالب محليًا، لكن تعذرت مزامنته مع Moodle: '.$exception->getMessage()])->withInput();
+        }
+
+        return back()->with('success', 'تمت إضافة الطالب ومزامنته مع Moodle بنجاح. رقم Moodle: '.$moodleId);
     }
 
     public function enrollStudent(Request $request): RedirectResponse

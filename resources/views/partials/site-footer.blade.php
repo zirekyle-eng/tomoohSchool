@@ -20,7 +20,7 @@
         </div>
         <div><h3>استكشف</h3><nav><a href="{{ route('home') }}">الرئيسية</a><a href="{{ route('catalog') }}">المواد الدراسية</a><a href="{{ route('pricing') }}">الأسعار والتسجيل</a><a href="{{ route('teachers') }}">مدرسونا</a></nav></div>
         <div><h3>عن طموح</h3><nav><a href="{{ route('about') }}">من نحن</a><a href="{{ route('contact') }}">تواصل معنا</a><a href="{{ route('teacher.apply') }}">انضم كمدرس</a><a href="{{ route('policies') }}">السياسات والشروط</a></nav></div>
-        <div><h3>حسابك</h3><nav><a href="{{ route('login') }}">تسجيل الدخول</a><a href="{{ route('register') }}">إنشاء حساب طالب</a></nav></div>
+        <div><h3>حسابك</h3><nav><a href="{{ route('login') }}">تسجيل الدخول</a><a href="{{ route('contact') }}">طلب تفعيل حساب</a></nav></div>
     </div>
     <div class="footer-bottom"><span>© {{ date('Y') }} مدرسة طموح الإلكترونية. جميع الحقوق محفوظة.</span><span>تعلم منظّم، خطوة أقرب للنجاح.</span></div>
 </footer>

@@ -29,8 +29,6 @@ Route::get('/pricing', [PublicController::class, 'pricing'])->name('pricing');
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.store');
-    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->name('register.store');
 });
 
 Route::middleware('auth')->group(function (): void {
@@ -45,6 +43,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/admin/payments', [AdminPaymentController::class, 'index'])->middleware('role:admin')->name('admin.payments');
     Route::post('/admin/payments', [AdminPaymentController::class, 'update'])->middleware('role:admin')->name('admin.payments.update');
     Route::get('/admin/students', [AdminController::class, 'students'])->middleware('role:admin')->name('admin.students');
+    Route::post('/admin/students', [AdminController::class, 'storeStudent'])->middleware('role:admin')->name('admin.students.store');
     Route::post('/admin/students/enroll', [AdminController::class, 'enrollStudent'])->middleware('role:admin')->name('admin.students.enroll');
     Route::get('/admin/teachers', [AdminController::class, 'teachers'])->middleware('role:admin')->name('admin.teachers');
     Route::post('/admin/teachers', [AdminController::class, 'storeTeacher'])->middleware('role:admin')->name('admin.teachers.store');

@@ -12,7 +12,7 @@ class MoodleService
         $baseUrl = config('services.moodle.url');
         $token = config('services.moodle.token');
 
-        if (!$baseUrl || !$token) {
+        if (! $baseUrl || ! $token) {
             throw new RuntimeException('إعدادات Moodle غير مكتملة.');
         }
 
@@ -20,9 +20,9 @@ class MoodleService
         $firstname = $parts[0] ?? $fullName;
         $lastname = $parts[1] ?? $firstname;
         $username = $this->username($phone);
-        $email = $username . '@students.local';
+        $email = 'tomooh@student.local';
 
-        $response = Http::timeout(20)->asForm()->post($baseUrl . 'webservice/rest/server.php', [
+        $response = Http::timeout(20)->asForm()->post($baseUrl.'webservice/rest/server.php', [
             'wstoken' => $token,
             'wsfunction' => 'core_user_create_users',
             'moodlewsrestformat' => 'json',
@@ -35,7 +35,7 @@ class MoodleService
             'users[0][city]' => $role === 'teacher' ? 'Teacher' : 'Student',
         ]);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             throw new RuntimeException('تعذر الاتصال بخادم Moodle.');
         }
 
@@ -45,7 +45,7 @@ class MoodleService
         }
 
         $userId = $payload[0]['id'] ?? null;
-        if (!$userId) {
+        if (! $userId) {
             throw new RuntimeException('لم يُرجع Moodle رقم الحساب الجديد.');
         }
 
@@ -56,6 +56,6 @@ class MoodleService
     {
         $username = preg_replace('/[^a-zA-Z0-9_]/', '', $phone) ?: 'user';
 
-        return strtolower('nukhba_' . $username);
+        return strtolower('nukhba_'.$username);
     }
 }
