@@ -51,6 +51,7 @@ class BigBlueButtonController extends Controller
             $class->viva_z_meeting_id,
             $class->bbb_attendee_password,
             (string) $request->user()->full_name,
+            route('bbb.class.ended', $class->id),
         ));
     }
 
@@ -104,6 +105,33 @@ class BigBlueButtonController extends Controller
             $class->viva_z_meeting_id,
             $class->bbb_moderator_password,
             (string) $request->user()->full_name,
+            route('bbb.class.ended', $class->id),
         ));
+    }
+
+    public function classEnded(Request $request, int $id): View
+    {
+        $class = DB::table('class_schedules as cs')
+            ->join('subjects as s', 's.id', '=', 'cs.subject_id')
+            ->join('grades as g', 'g.id', '=', 's.grade_id')
+            ->where('cs.id', $id)
+            ->where(function ($query) use ($request): void {
+                $query->where('cs.teacher_id', $request->user()->id)
+                    ->orWhereExists(function ($studentQuery) use ($request): void {
+                        $studentQuery->from('enrollments as e')
+                            ->whereColumn('e.subject_id', 'cs.subject_id')
+                            ->where('e.student_id', $request->user()->id)
+                            ->where('e.status', 'active');
+                    });
+            })
+            ->select('cs.id', 's.name as subject_name', 'g.name as grade_name')
+            ->first();
+
+        abort_unless($class, 404);
+
+        return view('bbb.ended', [
+            'class' => $class,
+            'requesterIsTeacher' => $request->user()->role === 'teacher',
+        ]);
     }
 }

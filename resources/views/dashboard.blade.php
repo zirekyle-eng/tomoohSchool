@@ -59,7 +59,7 @@
         <nav class="student-menu">
             <a class="active" href="#schedule">◈ جدولي</a>
             <a href="#subjects">▣ موادي</a>
-            <a href="{{ route('subjects.index') }}">＋ اختر مادة</a>
+            <a href="{{ route('recordings.index') }}">▶ التسجيلات</a>
         </nav>
         <form method="post" action="{{ route('logout') }}">@csrf<button class="student-logout" type="submit">↩ تسجيل الخروج</button></form>
     </aside>

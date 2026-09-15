@@ -38,6 +38,7 @@ return [
     'bbb' => [
         'base_url' => rtrim(env('BBB_SERVER_BASE_URL', ''), '/').'/',
         'secret' => env('BBB_SECRET'),
+            'playback_host' => rtrim(env('BBB_PLAYBACK_HOST', 'https://viva-zoom.fame-uk.net'), '/'),
     ],
 
     'moodle' => [

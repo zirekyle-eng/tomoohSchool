@@ -22,6 +22,7 @@
             <a class="{{ request()->routeIs('admin.academics*') ? 'active' : '' }}" href="{{ route('admin.academics') }}"><span>▣</span>الصفوف والمواد</a>
             <a class="{{ request()->routeIs('admin.payments*') ? 'active' : '' }}" href="{{ route('admin.payments') }}"><span>◉</span>الدفعات</a>
             <a class="{{ request()->routeIs('admin.schedule') ? 'active' : '' }}" href="{{ route('admin.schedule') }}"><span>◷</span>الجدول والغرف الدراسية</a>
+            <a class="{{ request()->routeIs('admin.recordings') ? 'active' : '' }}" href="{{ route('admin.recordings') }}"><span>▶</span>تسجيلات الحصص</a>
             <a class="{{ request()->routeIs('admin.teachers') ? 'active' : '' }}" href="{{ route('admin.teachers') }}"><span>♙</span>المدرسون</a>
             <a class="{{ request()->routeIs('admin.applications') ? 'active' : '' }}" href="{{ route('admin.applications') }}"><span>✉</span>طلبات المدرسين</a>
             <a class="{{ request()->routeIs('admin.students') ? 'active' : '' }}" href="{{ route('admin.students') }}"><span>◌</span>الطلاب والتسجيلات</a>

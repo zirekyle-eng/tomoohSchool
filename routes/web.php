@@ -5,10 +5,12 @@ use App\Http\Controllers\AdminApplicationsController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminNotificationsController;
 use App\Http\Controllers\AdminPaymentController;
+use App\Http\Controllers\AdminRecordingsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BigBlueButtonController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\RecordingsController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +37,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/dashboard', [SubjectController::class, 'dashboard'])->middleware('role:student')->name('dashboard');
     Route::post('/school-day/start', [SubjectController::class, 'startSchoolDay'])->middleware('role:student')->name('school-day.start');
     Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects.index');
+    Route::get('/recordings', [RecordingsController::class, 'index'])->middleware('role:student,teacher')->name('recordings.index');
     Route::post('/enrollments', [SubjectController::class, 'enroll'])->name('enrollments.store');
     Route::get('/payment', [PaymentController::class, 'create'])->middleware('role:student')->name('payment.create');
     Route::post('/payment', [PaymentController::class, 'store'])->middleware('role:student')->name('payment.store');
@@ -57,6 +60,7 @@ Route::middleware('auth')->group(function (): void {
     // Route::post('/admin/applications/{id}/approve', [AdminApplicationsController::class, 'approve'])->middleware('role:admin')->name('admin.applications.approve');
     // Route::post('/admin/applications/{id}/reject', [AdminApplicationsController::class, 'reject'])->middleware('role:admin')->name('admin.applications.reject');
     Route::get('/admin/schedule', [AdminController::class, 'schedule'])->middleware('role:admin')->name('admin.schedule');
+    Route::get('/admin/recordings', [AdminRecordingsController::class, 'index'])->middleware('role:admin')->name('admin.recordings');
     Route::post('/admin/schedule', [AdminController::class, 'storeSchedule'])->middleware('role:admin')->name('admin.schedule.store');
     Route::post('/admin/schedule/{id}/toggle', [AdminController::class, 'toggleSchedule'])->middleware('role:admin')->name('admin.schedule.toggle');
     Route::delete('/admin/schedule/{id}', [AdminController::class, 'deleteSchedule'])->middleware('role:admin')->name('admin.schedule.delete');
@@ -65,5 +69,6 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/teacher', [TeacherController::class, 'dashboard'])->middleware('role:teacher')->name('teacher.dashboard');
     Route::get('/teacher/classes/{id}/join', [BigBlueButtonController::class, 'teacherJoin'])->middleware('role:teacher')->name('bbb.teacher.join');
     Route::get('/classes/{id}/join', [BigBlueButtonController::class, 'studentJoin'])->middleware('role:student')->name('bbb.student.join');
+    Route::get('/classes/{id}/ended', [BigBlueButtonController::class, 'classEnded'])->name('bbb.class.ended');
     Route::post('/teacher/profile', [TeacherController::class, 'updateProfile'])->middleware('role:teacher')->name('teacher.profile.update');
 });

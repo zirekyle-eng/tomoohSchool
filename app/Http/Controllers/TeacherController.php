@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\BigBlueButtonService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Throwable;
 
 class TeacherController extends Controller
 {
-    public function dashboard(Request $request): View
+    public function dashboard(Request $request, BigBlueButtonService $bigBlueButton): View
     {
         $teacher = $request->user();
         $profile = DB::table('users as u')->leftJoin('teachers_profiles as tp', 'tp.user_id', '=', 'u.id')->where('u.id', $teacher->id)->select('u.full_name', 'u.phone', 'tp.specialization', 'tp.years_experience', 'tp.bio', 'tp.photo_path')->first();
@@ -20,8 +22,26 @@ class TeacherController extends Controller
             return $class;
         });
         $subjects = DB::table('class_schedules as cs')->join('subjects as s', 's.id', '=', 'cs.subject_id')->join('grades as g', 'g.id', '=', 's.grade_id')->where('cs.teacher_id', $teacher->id)->where('cs.status', 'active')->distinct()->orderBy('s.name')->select('s.name as subject_name', 'g.name as grade_name')->get();
+        $recordingsBySubject = collect();
+        $recordingsError = null;
+        $classesWithMeetings = $classes->filter(fn (object $class): bool => filled($class->viva_z_meeting_id));
+        if ($classesWithMeetings->isNotEmpty()) {
+            try {
+                $classesByMeetingId = $classesWithMeetings->keyBy('viva_z_meeting_id');
+                $recordingsBySubject = collect($bigBlueButton->getRecordings())
+                    ->filter(fn (array $recording): bool => $classesByMeetingId->has($recording['meeting_id']))
+                    ->map(function (array $recording) use ($classesByMeetingId): array {
+                        $recording['class'] = $classesByMeetingId->get($recording['meeting_id']);
 
-        return view('teacher.dashboard', compact('profile', 'classes', 'subjects'));
+                        return $recording;
+                    })->sortByDesc('start_time')->groupBy(fn (array $recording): string => $recording['class']->subject_name);
+            } catch (Throwable $exception) {
+                report($exception);
+                $recordingsError = 'تعذر جلب التسجيلات حاليًا.';
+            }
+        }
+
+        return view('teacher.dashboard', compact('profile', 'classes', 'subjects', 'recordingsBySubject', 'recordingsError'));
     }
 
     public function updateProfile(Request $request): RedirectResponse
