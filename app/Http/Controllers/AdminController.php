@@ -50,6 +50,9 @@ class AdminController extends Controller
             ->select('u.id', 'u.full_name', 'u.phone', 'u.country', 'u.city', 'u.status', DB::raw('COUNT(e.id) as subjects'))
             ->get();
 
+        $markets = DB::table('markets')->get();
+        // dd($markets);
+
         $enrollmentStudents = DB::table('users')->where('role', 'student')->orderBy('full_name')->get(['id', 'full_name', 'phone']);
         $subjects = DB::table('subjects as s')
             ->join('grades as g', 'g.id', '=', 's.grade_id')
@@ -57,8 +60,8 @@ class AdminController extends Controller
             ->orderBy('g.sort_order')->orderBy('s.name')
             ->get(['s.id', 's.name', 's.monthly_fee', 's.grade_id', 'g.name as grade_name']);
         $grades = DB::table('grades')->orderBy('sort_order')->orderBy('name')->get(['name']);
-
-        return view('admin.students', compact('students', 'enrollmentStudents', 'subjects', 'grades'));
+// dd($grades);
+        return view('admin.students', compact('students', 'enrollmentStudents', 'subjects', 'grades' , 'markets'));
     }
 
     public function storeStudent(Request $request, MoodleService $moodle): RedirectResponse
@@ -68,7 +71,7 @@ class AdminController extends Controller
             'phone' => ['required', 'string', 'max:30', 'unique:users,phone'],
             'email' => ['nullable', 'email', 'max:160', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'regex:/[A-Z]/', 'regex:/[^a-zA-Z0-9]/'],
-            'country' => ['nullable', 'string', 'max:80'],
+            'market_id' => ['required', 'integer', 'exists:markets,id'],
             'city' => ['nullable', 'string', 'max:100'],
             'student_mode' => ['required', 'in:regular,external'],
             'grade_level' => [
@@ -102,7 +105,7 @@ class AdminController extends Controller
                 'student_mode' => $data['student_mode'],
                 'grade_level' => $data['grade_level'] ?? null,
                 'branch' => $data['branch'] ?? null,
-                'market_id' => 1,
+                'market_id' => $data['market_id'],
             ]);
 
             if ($student->student_mode === 'regular') {

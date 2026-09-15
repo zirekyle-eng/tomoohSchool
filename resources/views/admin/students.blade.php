@@ -32,7 +32,22 @@
         <label class="field" id="student-branch-field">القسم
             <select id="student-branch" name="branch"><option value="">اختر القسم</option><option value="general" @selected(old('branch') === 'general')>مشترك</option><option value="scientific" @selected(old('branch') === 'scientific')>علمي</option><option value="literary" @selected(old('branch') === 'literary')>أدبي</option></select>
         </label>
-        <label class="field">الدولة <small>اختياري</small><input name="country" value="{{ old('country', 'فلسطين') }}" placeholder="الدولة"></label>
+
+        <label class="field">
+            الدولة
+            <select name="market_id" required>
+                <option value="">اختر الدولة</option>
+
+                @foreach($markets as $market)
+                    <option value="{{ $market->id }}"
+                        @selected((string) old('market_id') === (string) $market->id)>
+                        {{ $market->name }}
+                    </option>
+                @endforeach
+            </select>
+        </label>
+
+        {{-- <label class="field">الدولة <small>اختياري</small><input name="country" value="{{ old('country', 'فلسطين') }}" placeholder="الدولة"></label> --}}
         <label class="field">المدينة <small>اختياري</small><input name="city" value="{{ old('city') }}" placeholder="المدينة"></label>
         <button class="student-create-submit" type="submit">إضافة الطالب ومزامنة Moodle</button>
     </form>

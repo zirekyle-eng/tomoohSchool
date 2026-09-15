@@ -7,7 +7,7 @@ use RuntimeException;
 
 class MoodleService
 {
-    public function createUser(string $fullName, string $phone, string $password, string $role): int
+    public function createUser(string $fullName, string $phone, string $password, string $role ,?string $email = null): int
     {
         $baseUrl = config('services.moodle.url');
         $token = config('services.moodle.token');
@@ -20,26 +20,34 @@ class MoodleService
         $firstname = $parts[0] ?? $fullName;
         $lastname = $parts[1] ?? $firstname;
         $username = $this->username($phone);
-        $email = 'tomooh@student.local';
+        // $email = 'tomooh@student.local';
+        $email = $email ?: $username . '@tomooh.local';
 
-        $response = Http::timeout(20)->asForm()->post($baseUrl.'webservice/rest/server.php', [
-            'wstoken' => $token,
-            'wsfunction' => 'core_user_create_users',
-            'moodlewsrestformat' => 'json',
-            'users[0][username]' => $username,
-            'users[0][password]' => $password,
-            'users[0][firstname]' => $firstname,
-            'users[0][lastname]' => $lastname,
-            'users[0][email]' => $email,
-            'users[0][auth]' => 'manual',
-            'users[0][city]' => $role === 'teacher' ? 'Teacher' : 'Student',
-        ]);
+        $response = Http::timeout(20)
+    ->withOptions([
+        'verify' => false,
+    ])
+    ->asForm()
+    ->post($baseUrl.'webservice/rest/server.php', [
+        'wstoken' => $token,
+        'wsfunction' => 'core_user_create_users',
+        'moodlewsrestformat' => 'json',
+        'users[0][username]' => $username,
+        'users[0][password]' => $password,
+        'users[0][firstname]' => $firstname,
+        'users[0][lastname]' => $lastname,
+        'users[0][email]' => $email,
+        'users[0][auth]' => 'manual',
+        'users[0][city]' => $role === 'teacher' ? 'Teacher' : 'Student',
+    ]);
 
         if (! $response->successful()) {
             throw new RuntimeException('تعذر الاتصال بخادم Moodle.');
         }
 
         $payload = $response->json();
+
+// dd($payload);
         if (isset($payload['exception']) || isset($payload['errorcode'])) {
             throw new RuntimeException((string) ($payload['message'] ?? 'تعذر إنشاء الحساب في Moodle.'));
         }
