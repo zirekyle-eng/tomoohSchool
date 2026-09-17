@@ -2,7 +2,8 @@
 @section('content')
 <style>
     .teachers-page{background:#fbf9fd;min-height:calc(100vh - 72px);padding-bottom:86px}
-    .teachers-hero{position:relative;overflow:hidden;min-height:280px;padding:54px 20px 92px;background:linear-gradient(115deg,#291541 0%,#432568 58%,#56377d 100%);color:#fff;text-align:center}
+    .teachers-hero{
+        position:relative;overflow:hidden;min-height:280px;padding:54px 20px 92px;background:linear-gradient(115deg,#291541 0%,#432568 58%,#56377d 100%);color:#fff;text-align:center}
     .teachers-hero:before,.teachers-hero:after{content:'';position:absolute;border-radius:50%;background:#ffc857;opacity:.08;pointer-events:none}
     .teachers-hero:before{width:300px;height:300px;left:-100px;top:-180px}
     .teachers-hero:after{width:240px;height:240px;right:-80px;bottom:-160px}
@@ -36,12 +37,17 @@
 
     /* Calm teacher directory: open page, stronger hierarchy, quieter cards. */
     .teachers-page{background:#fffaf6;padding-bottom:92px}
-    .teachers-hero{min-height:320px;padding:64px 20px 116px;background:var(--plum);text-align:right}
+    .teachers-hero{
+    min-height:320px;
+    padding:64px 20px 116px;
+    background:var(--plum);
+    text-align:center;
+}
     .teachers-hero:before{width:390px;height:390px;left:-150px;top:-230px;background:#ffc857;opacity:.08}
     .teachers-hero:after{width:280px;height:280px;right:10%;bottom:-220px;background:#fff;opacity:.04}
     .teachers-hero .container{width:min(1140px,calc(100% - 36px))}
-    .teachers-hero h1{max-width:670px;margin:18px 0 8px;font-size:clamp(34px,5vw,54px)}
-    .teachers-hero p{max-width:540px;margin:0;color:#d9cbe8;font-size:13px}
+    .teachers-hero h1{max-width:670px;margin:18px auto 8px;font-size:clamp(34px,5vw,54px)}
+    .teachers-hero p{max-width:540px;margin:0 auto;color:#d9cbe8;font-size:13px}
     .teachers-panel{width:min(1140px,calc(100% - 36px));margin:-45px auto 0;padding:25px 0 0;background:transparent;border:0;box-shadow:none}
     .teachers-heading{padding:20px 24px;margin-bottom:22px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 30px #2915400d;border-bottom:0}
     .teachers-heading h2{font-size:23px}
