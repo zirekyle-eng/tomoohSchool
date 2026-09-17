@@ -33,6 +33,7 @@ class AdminAcademicsController extends Controller
     public function storeSubject(Request $request): RedirectResponse
     {
         $data = $request->validate([
+            'subject_id' => ['nullable', 'integer', 'exists:subjects,id'],
             'grade_id' => ['required', 'integer', 'exists:grades,id'],
             'name' => ['required', 'string', 'max:120'],
             'monthly_fee' => ['nullable', 'numeric', 'min:0'],
@@ -53,11 +54,6 @@ class AdminAcademicsController extends Controller
             'image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:4096'],
         ]);
 
-        // $imagePath = null;
-        // if ($request->hasFile('image')) {
-        //     $imagePath = $request->file('image')->store('uploads/subjects', 'public');
-        // }
-
         $imagePath = null;
         if ($request->hasFile('image')) {
             $directory = public_path('uploads/subjects');
@@ -69,19 +65,39 @@ class AdminAcademicsController extends Controller
             $imagePath = 'public/uploads/subjects/'.$filename;
         }
 
-        DB::table('subjects')->insert([
-            'grade_id' => $data['grade_id'], 'market_id' => $data['market_id'], 'name' => $data['name'],
-            'description' => $data['description'] ?? null, 'monthly_fee' => $data['monthly_fee'] ?? 0,
-
-            'image_path' => $imagePath ? 'public/' . $imagePath : null,
-            'status' => 'active', 'tawjihi_branch' => $data['tawjihi_branch'], 'enrollment_term' => $data['enrollment_term'],
-            'sessions_per_week' => $data['sessions_per_week'], 'total_hours' => $data['total_hours'] ?? null,
-            'start_date' => $data['start_date'] ?? null, 'end_date' => $data['end_date'] ?? null,
-            'free_preview_url' => $data['free_preview_url'] ?? null, 'unit_plan' => $data['unit_plan'] ?? null,
-            'make_up_policy' => $data['make_up_policy'] ?? null, 'delivery_type' => $data['delivery_type'],
+        $payload = [
+            'grade_id' => $data['grade_id'],
+            'market_id' => $data['market_id'],
+            'name' => $data['name'],
+            'description' => $data['description'] ?? null,
+            'monthly_fee' => $data['monthly_fee'] ?? 0,
+            'status' => 'active',
+            'tawjihi_branch' => $data['tawjihi_branch'],
+            'enrollment_term' => $data['enrollment_term'],
+            'sessions_per_week' => $data['sessions_per_week'],
+            'total_hours' => $data['total_hours'] ?? null,
+            'start_date' => $data['start_date'] ?? null,
+            'end_date' => $data['end_date'] ?? null,
+            'free_preview_url' => $data['free_preview_url'] ?? null,
+            'unit_plan' => $data['unit_plan'] ?? null,
+            'make_up_policy' => $data['make_up_policy'] ?? null,
+            'delivery_type' => $data['delivery_type'],
             'recorded_lectures_url' => $data['recorded_lectures_url'] ?? null,
             'primary_teacher_id' => $data['primary_teacher_id'] ?? null,
-        ]);
+        ];
+
+        if ($imagePath) {
+            $payload['image_path'] = str_replace('public/', '', $imagePath);
+        }
+
+        if (! empty($data['subject_id'])) {
+            DB::table('subjects')->where('id', $data['subject_id'])->update($payload);
+
+            return back()->with('success', 'تم تحديث المادة.');
+        }
+
+        $payload['image_path'] = $imagePath ? str_replace('public/', '', $imagePath) : null;
+        DB::table('subjects')->insert($payload);
 
         return back()->with('success', 'تمت إضافة المادة.');
     }

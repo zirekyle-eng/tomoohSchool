@@ -164,15 +164,17 @@
         display: flex;
         flex-direction: column;
         transition: transform 0.15s ease;
+        min-height: 100%;
     }
-    
+
     .card:hover {
         transform: translateY(-5px) rotate(-0.5deg);
         box-shadow: 0 10px 30px rgba(46, 26, 71, 0.2);
     }
-    
+
     .cover {
-        height: 145px;
+        height: 150px;
+        min-height: 150px;
         background: linear-gradient(135deg, var(--coral), var(--plum-light));
         display: grid;
         place-items: center;
@@ -180,23 +182,17 @@
         font-size: 44px;
         font-weight: 800;
         position: relative;
+        flex-shrink: 0;
+        overflow: hidden;
     }
-    
+
     .cover img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-    }
-    
-    .cover-placeholder {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
+        display: block;
         background: linear-gradient(135deg, var(--coral), var(--plum-light));
         font-size: 3.5rem;
-        animation: float 3s ease-in-out infinite;
     }
     
     @keyframes float {
@@ -210,8 +206,10 @@
     
     .card-copy {
         padding: 20px;
-    }
-    
+        display: block;
+        position: relative;
+        z-index: 1;
+        background: #fff;
     .card h2 {
         font-size: 19px;
         margin: 12px 0 7px;
@@ -354,7 +352,7 @@
                                                 <article class="card">
                                                     <div class="cover">
                                                         @if($subject->image_path)
-                                                            <img src="{{ asset($subject->image_path) }}" alt="{{ $subject->name }}">
+                                                            <img src="{{ asset(str_replace('public/', '', $subject->image_path)) }}" alt="{{ $subject->name }}">
                                                         @else
                                                             <div class="cover-placeholder">📚</div>
                                                         @endif
@@ -362,10 +360,6 @@
                                                     <div class="card-copy">
                                                         <h2>{{ $subject->name }}</h2>
                                                         <p>{{ $subject->description ?: 'تفاصيل المساق وخطته متاحة في صفحة المادة.' }}</p>
-                                                        <div class="catalog-price">
-                                                            <strong>{{ number_format((float) $subject->monthly_fee, 2) }}</strong>
-                                                            <span>شيكل / شهريًا</span>
-                                                        </div>
                                                         <div class="catalog-meta">
                                                             <span>{{ $subject->delivery_type === 'recorded' ? 'مسجلة' : 'مباشرة حسب الجدول' }}</span>
                                                             <span>{{ $subject->sessions_per_week ?? 0 }} حصص أسبوعيًا</span>
