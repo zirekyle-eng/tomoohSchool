@@ -35,28 +35,48 @@
     .subject-group h3{display:flex;align-items:center;gap:8px;margin:0 0 10px;color:#2e1a47;font-size:16px}
     .subject-group h3 span{padding:4px 8px;border-radius:999px;background:#f2eaff;color:#7651ad;font-size:10px}
     .subject-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-    .subject-card{border:1px solid #eee3f1;border-radius:16px;padding:16px;background:#fff;transition:.2s}
-    .subject-card:hover{border-color:#ffb09e;transform:translateY(-2px)}
-    .subject-card h4{margin:0 0 7px;color:#2e1a47;font-size:16px}
+    .subject-card{border:1px solid #eee3f1;border-radius:18px;padding:18px;background:linear-gradient(180deg,#ffffff 0%, #f8faff 100%);transition:.2s;box-shadow:0 8px 22px rgba(53,39,79,.06)}
+    .subject-card:hover{border-color:#ffb09e;transform:translateY(-2px);box-shadow:0 14px 28px rgba(53,39,79,.12)}
+    .subject-card h4{margin:0 0 7px;color:#2e1a47;font-size:18px}
     .subject-card p{min-height:38px;margin:0 0 12px;color:#756882;font-size:11px;line-height:1.7}
     .subject-info{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
     .subject-info span{padding:5px 8px;border-radius:999px;background:#f8f2fa;color:#756882;font-size:10px}
-    .subject-price{display:flex;align-items:baseline;gap:5px;color:#2e1a47}
+    .subject-price{display:flex;align-items:baseline;gap:5px;color:#2e1a47;margin-top:8px}
     .subject-price strong{font-size:22px}
     .subject-price small{color:#756882;font-size:10px}
+    .subject-payment-tag{display:inline-block;margin-bottom:8px;padding:5px 10px;border-radius:999px;background:#fff8df;border:1px solid #f7d982;color:#7a5a11;font-size:10px;font-weight:800}
     .subject-link{display:block;margin-top:12px;text-align:center;padding:10px;border-radius:10px;background:#ff6b4a;color:#fff;font-size:11px;font-weight:800}
+    .subject-category-list{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
+    .subject-category-list span{padding:7px 12px;border-radius:999px;background:#f1ebff;color:#4f2b88;font-size:11px;font-weight:800;border:1px solid #e3d8ff}
     .empty-prices{text-align:center;padding:24px;color:#756882}
     .pricing-note{display:flex;gap:10px;align-items:flex-start;padding:15px;border-radius:14px;background:#fff7df;color:#755c18;font-size:12px;line-height:1.8}
     .package-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
     .package-card{border:2px solid #ffb09e;border-radius:18px;padding:20px;background:linear-gradient(145deg,#fff8f4,#fff)}
     .package-card h3{margin:0 0 7px;color:#2e1a47;font-size:19px}
     .package-card p{margin:0;color:#756882;font-size:12px;line-height:1.8}
-    .package-price{margin:18px 0;color:#2e1a47;font-size:30px;font-weight:800}
+    .package-price{margin:12px 0 8px;color:#2e1a47;font-size:30px;font-weight:800}
     .package-price small{color:#756882;font-size:11px;font-weight:500}
+    .package-payment-tag{display:inline-block;margin:0 0 8px;padding:5px 12px;border-radius:999px;background:#fff7de;border:1px solid #f3d67d;color:#7e5d00;font-size:10px;font-weight:800}
     .package-subjects{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
     .package-subjects span{padding:5px 8px;border-radius:999px;background:#f2eaff;color:#64468e;font-size:10px}
-    .package-action{display:block;text-align:center;padding:11px;border-radius:10px;background:#ff6b4a;color:#fff;font-size:12px;font-weight:800}
+    .package-action{display:block;text-align:center;padding:11px;border-radius:10px;background:#ff6b4a;color:#fff;font-size:12px;font-weight:800;cursor:pointer;border:0}
     .package-empty{padding:10px 0;color:#a63e2a;font-size:11px}
+    .registration-modal{position:fixed;inset:0;background:rgba(32,16,46,.28);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px}
+    .registration-modal.hidden{display:none}
+    .registration-panel{width:min(520px,100%);background:#fff;border-radius:22px;padding:20px 18px 18px;box-shadow:0 25px 60px rgba(21,12,35,.16);position:relative}
+    .registration-panel h3{margin:0 0 20px;text-align:center;color:#2e1a47;font-size:30px;line-height:1.2;font-weight:800}
+    .registration-close{position:absolute;top:12px;right:14px;background:#f5eef9;border:none;border-radius:50%;width:34px;height:34px;font-size:22px;color:#56377d;cursor:pointer}
+    .registration-form{display:grid;gap:16px}
+    .registration-row{display:grid;gap:8px}
+    .registration-row label{color:#2f1f42;font-size:16px;font-weight:700;text-align:right;display:block}
+    .registration-row input,.registration-row select{width:100%;border:2px solid #f6a177;border-radius:12px;padding:12px 14px;font-size:14px;background:#fff;color:#2e1a47;appearance:none;-webkit-appearance:none;-moz-appearance:none;box-sizing:border-box}
+    .select-wrap{position:relative}
+    .select-wrap select{padding-left:42px}
+    .select-wrap .select-caret{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:#2e1a47;pointer-events:none}
+    .registration-row input::placeholder{color:#9aa0ae}
+    .registration-row input:focus,.registration-row select:focus{outline:none;border-color:#ff8c56;box-shadow:0 0 0 3px rgba(255,140,86,.14)}
+    .registration-submit{margin-top:10px;border:0;border-radius:14px;padding:14px;background:linear-gradient(135deg,#ff7b4d,#ff5b50);color:#fff;font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 8px 16px rgba(255,107,74,.2)}
+    .hidden{display:none!important}
     @media(max-width:800px){.subject-grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:600px){.package-grid{grid-template-columns:1fr}}
     @media(max-width:600px){.pricing-wrap{width:min(100% - 20px,1120px)}.pricing-section{padding:18px}.plans,.subject-grid{grid-template-columns:1fr}.section-heading{display:block}.subject-card p{min-height:0}}
@@ -132,6 +152,7 @@
                         <article class="package-card">
                             <h3>{{ $package['title'] }}</h3>
                             <p>{{ $package['description'] }}</p>
+                            <span class="package-payment-tag">الدفع فصلي</span>
                             <div class="package-price">{{ number_format($package['price'], 0) }} <small>{{ $currency }} / {{ config('pricing.term_label') }}</small></div>
                             @if($package['subjects']->isNotEmpty())
                                 <div class="package-subjects">
@@ -140,60 +161,73 @@
                             @else
                                 <div class="package-empty">سيتم تحديد مواد هذا الفرع عند اكتمال جدول المواد.</div>
                             @endif
-                            @php
-                                $packageMessage = "مرحباً، أرغب بالتسجيل في {$package['title']} للمدرسة النظامية في {$regionTitle}. السعر: {$package['price']} {$currency} / " . config('pricing.term_label') . ".";
-                                $packageWhatsapp = 'https://wa.me/' . preg_replace('/\D+/', '', $whatsapp) . '?text=' . rawurlencode($packageMessage);
-                            @endphp
-                            <a class="package-action" href="{{ $packageWhatsapp }}" target="_blank" rel="noopener">ابدأ تسجيل البكج عبر واتساب</a>
+                            <button type="button"
+                                    class="package-action registration-trigger"
+                                    data-type="package"
+                                    data-title="{{ $package['title'] }}"
+                                    data-price="{{ $package['price'] }}"
+                                    data-region="{{ $regionTitle }}"
+                                    data-currency="{{ $currency }}"
+                                    data-whatsapp="{{ preg_replace('/\D+/', '', $whatsapp) }}">
+                                ابدأ تسجيل البكج عبر واتساب
+                            </button>
                         </article>
                     @endforeach
                 </div>
             </div>
 
             <div class="pricing-view" data-pricing-view="subjects">
-            <div class="section-heading">
-                <div>
-                    <h2>المواد المتاحة للتسجيل</h2>
-                    <p>الأسعار التالية للمواد المنفصلة، أما البكجات النظامية فموضحة في التبويب الأول.</p>
+                <div class="section-heading">
+                    <div>
+                        <h2>المواد المنفصلة</h2>
+                        <p>الأسعار الثابتة للمواد المنفصلة حسب المرحلة، بدون ربط بالمواد الإلكترونية في النظام.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="subject-toolbar">
-                <span><strong>{{ $subjects->count() }}</strong> مادة متاحة حاليًا</span>
-                <span>العملة: <strong>{{ $currency }}</strong></span>
-            </div>
 
-            @if($subjects->isEmpty())
-                <div class="empty-prices">لا توجد مواد بسعر محدد حاليًا. تواصل معنا لمعرفة البرامج المتاحة.</div>
-            @else
-                <div class="subject-groups">
-                    @foreach($subjects->groupBy(fn ($subject) => $subject->grade?->name ?: 'مواد عامة') as $gradeName => $gradeSubjects)
-                        <div class="subject-group">
-                            <h3>{{ $gradeName }} <span>{{ $gradeSubjects->count() }} مواد</span></h3>
-                            <div class="subject-grid">
-                                @foreach($gradeSubjects as $subject)
-                                    <article class="subject-card">
-                                        <h4>{{ $subject->name }}</h4>
-                                        <p>{{ $subject->description ?: 'مادة تعليمية مع شرح ومتابعة حسب الجدول الدراسي.' }}</p>
-                                        <div class="subject-info">
-                                            <span>{{ $subject->delivery_type === 'recorded' ? 'مسجلة' : 'مباشرة' }}</span>
-                                            <span>{{ $subject->sessions_per_week ?? 0 }} حصص أسبوعيًا</span>
-                                        </div>
-                                        <div class="subject-price">
-                                            <strong>{{ number_format((float) $subject->monthly_fee, 2) }}</strong>
-                                            <small>للمادة / شهريًا</small>
-                                        </div>
-                                        @php
-                                            $subjectMessage = "مرحباً، أرغب بالتسجيل في مادة {$subject->name} ضمن {$regionTitle}. السعر الظاهر: {$subject->monthly_fee} {$currency} شهريًا. أرجو تزويدي بتفاصيل التسجيل.";
-                                            $subjectWhatsapp = 'https://wa.me/' . preg_replace('/\D+/', '', $whatsapp) . '?text=' . rawurlencode($subjectMessage);
-                                        @endphp
-                                        <a class="subject-link" href="{{ $subjectWhatsapp }}" target="_blank" rel="noopener">عرض التفاصيل والتسجيل</a>
-                                    </article>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endforeach
+                <div class="subject-category-list">
+                    <span>التاريخ</span>
+                    <span>العلوم</span>
+                    <span>الرياضيات</span>
+                    <span>اللغة الإنجليزية</span>
+                    <span>الفزياء</span>
+                    <span>الكيمياء</span>
+                    <span>الأحياء</span>
+                    <span>اللغة العربية</span>
+                    <span>الجغرافيا </span>
+                    <span>الثقافة العلمية</span>
                 </div>
-            @endif
+
+                @foreach($subjectPricing as $groupKey => $group)
+                    @php
+                        $groupTitle = $groupKey === 'basic' ? 'المرحلة الأساسية' : 'المرحلة الثانوية';
+                    @endphp
+                    <div class="subject-group" style="margin-top: 20px;">
+                        <h3>{{ $groupTitle }} <span>{{ count($group) }} مواد</span></h3>
+                        <div class="subject-grid">
+                            @foreach($group as $item)
+                                <article class="subject-card">
+                                    <h4>{{ $item['label'] }}</h4>
+                                    <p>مادة منفصلة حسب المستوى الدراسي المختار.</p>
+                                    <span class="subject-payment-tag">الدفع فصلي</span>
+                                    <div class="subject-price">
+                                        <strong>{{ number_format((float) $item['price'], 0) }}</strong>
+                                        <small>{{ $currency }}</small>
+                                    </div>
+                                    <button type="button"
+                                            class="subject-link registration-trigger"
+                                            data-type="subject"
+                                            data-title="{{ $item['label'] }}"
+                                            data-price="{{ $item['price'] }}"
+                                            data-region="{{ $regionTitle }}"
+                                            data-currency="{{ $currency }}"
+                                            data-whatsapp="{{ preg_replace('/\D+/', '', $whatsapp) }}">
+                                        تسجيل المادة
+                                    </button>
+                                </article>
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </section>
 
@@ -202,6 +236,71 @@
             <div><strong>هل تحتاج مساعدة؟</strong><br>إذا لم تعرف أي نظام يناسب الطالب، ابدأ بالمواد المنفصلة أو تواصل معنا لنساعدك في اختيار الصف والمواد المناسبة.</div>
         </div>
     </main>
+</div>
+
+<div id="registrationModal" class="registration-modal hidden" aria-hidden="true">
+    <div class="registration-panel" role="dialog" aria-modal="true" aria-labelledby="registrationTitle">
+        <button type="button" class="registration-close" aria-label="إغلاق">×</button>
+        <h3 id="registrationTitle">تسجيل الطالب</h3>
+        <form id="registrationForm" class="registration-form">
+            <input type="hidden" name="registrationType" id="registrationType">
+            <input type="hidden" name="registrationTitle" id="registrationTitleHidden">
+            <input type="hidden" name="registrationPrice" id="registrationPriceHidden">
+            <input type="hidden" name="registrationRegion" id="registrationRegionHidden">
+            <input type="hidden" name="registrationCurrency" id="registrationCurrencyHidden">
+            <input type="hidden" name="registrationWhatsapp" id="registrationWhatsappHidden">
+
+            <div class="registration-row">
+                <label for="studentName">اسم الطالب</label>
+                <input id="studentName" name="studentName" type="text" placeholder="اكتب اسم الطالب" required>
+            </div>
+
+            <div class="registration-row">
+                <label for="studentPhone">رقم الهاتف</label>
+                <input id="studentPhone" name="studentPhone" type="tel" placeholder="05XXXXXXXX" required>
+            </div>
+
+            <div class="registration-row" id="gradeRow">
+                <label for="studentGrade">الصف</label>
+                <div class="select-wrap">
+                    <select id="studentGrade" name="studentGrade" required>
+                        <option value="">اختر الصف</option>
+                        <option value="الصف السابع">الصف السابع</option>
+                        <option value="الصف الثامن">الصف الثامن</option>
+                        <option value="الصف التاسع">الصف التاسع</option>
+                        <option value="الصف العاشر">الصف العاشر</option>
+                        <option value="الصف حادي عشر علمي">الصف حادي عشر علمي</option>
+                        <option value="الصف حادي عشر أدبي">الصف حادي عشر أدبي</option>
+                        <option value="الصف توجيهي علمي">الصف توجيهي علمي</option>
+                        <option value="الصف توجيهي أدبي">الصف توجيهي أدبي</option>
+                    </select>
+                    <span class="select-caret">⌄</span>
+                </div>
+            </div>
+
+            <div class="registration-row hidden" id="subjectRow">
+                <label for="studentSubject">المادة</label>
+                <div class="select-wrap">
+                    <select id="studentSubject" name="studentSubject">
+                        <option value="">اختر المادة</option>
+                        <option value="التاريخ">التاريخ</option>
+                        <option value="العلوم">العلوم</option>
+                        <option value="الرياضيات">الرياضيات</option>
+                        <option value="اللغة الإنجليزية">اللغة الإنجليزية</option>
+                        <option value="الفزياء">الفزياء</option>
+                        <option value="الكيمياء">الكيمياء</option>
+                        <option value="الأحياء">الأحياء</option>
+                        <option value="اللغة العربية">اللغة العربية</option>
+                        <option value="الجغرافيا">الجغرافيا</option>
+                        <option value="الثقافة العلمية">الثقافة العلمية</option>
+                    </select>
+                    <span class="select-caret">⌄</span>
+                </div>
+            </div>
+
+            <button type="submit" class="registration-submit">إرسال على الواتساب</button>
+        </form>
+    </div>
 </div>
 <script>
 document.querySelectorAll('[data-pricing-tab]').forEach(function (button) {
@@ -214,6 +313,102 @@ document.querySelectorAll('[data-pricing-tab]').forEach(function (button) {
             view.classList.toggle('active', view.dataset.pricingView === key);
         });
     });
+});
+
+var modal = document.getElementById('registrationModal');
+var form = document.getElementById('registrationForm');
+var gradeRow = document.getElementById('gradeRow');
+var subjectRow = document.getElementById('subjectRow');
+var closeBtn = document.querySelector('.registration-close');
+
+function openRegistrationModal(button) {
+    var type = button.dataset.type;
+    var title = button.dataset.title || '';
+    var price = button.dataset.price || '';
+    var region = button.dataset.region || '';
+    var currency = button.dataset.currency || '';
+    var whatsapp = button.dataset.whatsapp || '';
+
+    document.getElementById('registrationType').value = type;
+    document.getElementById('registrationTitleHidden').value = title;
+    document.getElementById('registrationPriceHidden').value = price;
+    document.getElementById('registrationRegionHidden').value = region;
+    document.getElementById('registrationCurrencyHidden').value = currency;
+    document.getElementById('registrationWhatsappHidden').value = whatsapp;
+
+    if (type === 'package') {
+        gradeRow.classList.remove('hidden');
+        subjectRow.classList.add('hidden');
+        document.getElementById('studentGrade').setAttribute('required', 'required');
+        document.getElementById('studentSubject').removeAttribute('required');
+        document.getElementById('studentSubject').value = '';
+    } else {
+        gradeRow.classList.remove('hidden');
+        subjectRow.classList.remove('hidden');
+        document.getElementById('studentGrade').setAttribute('required', 'required');
+        document.getElementById('studentSubject').setAttribute('required', 'required');
+    }
+
+    modal.classList.remove('hidden');
+    modal.setAttribute('aria-hidden', 'false');
+    document.getElementById('studentName').focus();
+}
+
+function closeRegistrationModal() {
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden', 'true');
+    form.reset();
+}
+
+document.querySelectorAll('.registration-trigger').forEach(function (button) {
+    button.addEventListener('click', function () {
+        openRegistrationModal(button);
+    });
+});
+
+closeBtn.addEventListener('click', closeRegistrationModal);
+modal.addEventListener('click', function (event) {
+    if (event.target === modal) {
+        closeRegistrationModal();
+    }
+});
+
+form.addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    var type = document.getElementById('registrationType').value;
+    var title = document.getElementById('registrationTitleHidden').value;
+    var price = document.getElementById('registrationPriceHidden').value;
+    var region = document.getElementById('registrationRegionHidden').value;
+    var currency = document.getElementById('registrationCurrencyHidden').value;
+    var whatsapp = document.getElementById('registrationWhatsappHidden').value;
+    var studentName = document.getElementById('studentName').value.trim();
+    var studentPhone = document.getElementById('studentPhone').value.trim();
+    var studentGrade = document.getElementById('studentGrade').value.trim();
+    var studentSubject = document.getElementById('studentSubject').value.trim();
+
+    var selectedItem = type === 'package' ? title : studentSubject || title;
+    var selectedGrade = studentGrade || 'غير محدد';
+    var itemLabel = type === 'package' ? 'البكج' : 'المادة';
+
+    var message = [
+        'مرحباً، أود التسجيل.',
+        '',
+        'النوع: ' + itemLabel,
+        'العنوان: ' + selectedItem,
+        'السعر: ' + price + ' ' + currency,
+        'المنطقة: ' + region,
+        'اسم الطالب: ' + studentName,
+        'رقم الهاتف: ' + studentPhone,
+        'الصف: ' + selectedGrade,
+        type === 'subject' ? 'المادة المختارة: ' + studentSubject : 'اسم البكج: ' + title,
+        '',
+        'يرجى تزويدي بتفاصيل التسجيل.'
+    ].join('\n');
+
+    var waUrl = 'https://wa.me/' + whatsapp + '?text=' + encodeURIComponent(message);
+    window.open(waUrl, '_blank', 'noopener');
+    closeRegistrationModal();
 });
 </script>
 @endsection

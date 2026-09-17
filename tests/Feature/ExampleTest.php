@@ -16,4 +16,15 @@ class ExampleTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function test_the_palestine_pricing_uses_fixed_subject_prices(): void
+    {
+        $response = $this->get('/pricing?region=palestine');
+
+        $response->assertStatus(200)
+            ->assertSee('80')
+            ->assertSee('100')
+            ->assertSee('غزة والضفة')
+            ->assertDontSee('مواد متاحة حاليًا');
+    }
 }

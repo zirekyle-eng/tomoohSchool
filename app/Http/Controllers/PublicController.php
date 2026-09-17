@@ -50,28 +50,24 @@ class PublicController extends Controller
     public function pricing(Request $request): View
     {
         $regionKey = $request->string('region')->toString() === 'egypt' ? 'egypt' : 'palestine';
-        $subjects = Subject::query()
-            ->with('grade')
-            ->where('status', 'active')
-            ->where('monthly_fee', '>', 0)
-            ->orderBy('grade_id')
-            ->orderBy('name')
-            ->get();
         $region = config('pricing.regions.'.$regionKey);
-        $packages = collect($region['packages'])->map(function (array $package) use ($subjects): array {
-            $package['subjects'] = $subjects->filter(function (Subject $subject) use ($package): bool {
-                return (string) $subject->grade?->name === 'الصف '.$package['grade_level']
-                    && in_array($subject->tawjihi_branch, ['general', $package['branch']], true);
-            })->values();
+
+        $packages = collect($region['packages'])->map(function (array $package): array {
+            $package['subjects'] = collect();
 
             return $package;
         });
+
+        $subjectPricing = [
+            'basic' => $region['subjects'] ?? [],
+            'advanced' => $region['advanced_subjects'] ?? [],
+        ];
 
         $currency = $region['currency'];
         $regionTitle = $region['title'];
         $whatsapp = config('pricing.whatsapp.'.$regionKey);
 
-        return view('public.pricing', compact('subjects', 'packages', 'currency', 'regionKey', 'regionTitle', 'whatsapp'));
+        return view('public.pricing', compact('packages', 'currency', 'regionKey', 'regionTitle', 'whatsapp', 'subjectPricing'));
     }
 
     public function teachers(): View
