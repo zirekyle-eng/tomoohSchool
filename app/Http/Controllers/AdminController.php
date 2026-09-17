@@ -417,43 +417,101 @@ class AdminController extends Controller
     }
 
     public function accounts(): View
-    {
-        $accounts = DB::table('users')->orderByDesc('created_at')->select('id', 'full_name', 'email', 'phone', 'role', 'status', 'country', 'city', 'market_id', 'student_mode', 'grade_level', 'branch', 'created_at')->get();
+{
+    $accounts = DB::table('users')
+    ->leftJoin('markets', 'markets.id', '=', 'users.market_id')
+    ->orderByDesc('users.created_at')
+    ->select(
+        'users.id',
+        'users.full_name',
+        'users.email',
+        'users.phone',
+        'users.role',
+        'users.status',
+        'users.city',
+        'users.market_id',
+        'users.student_mode',
+        'users.grade_level',
+        'users.branch',
+        'users.created_at',
+        'markets.name as market_name'
+    )
+    ->get();
 
-        return view('admin.accounts', compact('accounts'));
+    $markets = DB::table('markets')
+        ->orderBy('name')
+        ->get();
+
+    $grades = DB::table('grades')
+        ->orderBy('id')
+        ->get();
+
+
+    return view('admin.accounts', compact(
+        'accounts',
+        'markets',
+        'grades'
+    ));
+}
+
+public function updateAccount(Request $request, int $id): RedirectResponse
+{
+    $account = DB::table('users')->where('id', $id)->first();
+
+    abort_unless($account, 404);
+
+    $data = $request->validate([
+        'full_name' => ['required', 'string', 'max:160'],
+        'email' => ['nullable', 'email', 'max:160', 'unique:users,email,' . $id],
+        'phone' => ['required', 'string', 'max:30', 'unique:users,phone,' . $id],
+
+        'role' => ['required', 'in:student,teacher,admin'],
+        'status' => ['required', 'in:active,inactive'],
+
+        'market_id' => ['nullable', 'integer', 'exists:markets,id'],
+
+        'city' => ['nullable', 'string', 'max:100'],
+
+        'student_mode' => ['required', 'in:regular,external'],
+
+        'grade_level' => ['nullable', 'string', 'max:30'],
+
+        'branch' => ['nullable', 'in:general,scientific,literary'],
+
+        'password' => [
+            'nullable',
+            'string',
+            'min:8',
+            'regex:/[A-Z]/',
+            'regex:/[^a-zA-Z0-9]/',
+        ],
+    ]);
+
+    $userData = [
+        'full_name' => $data['full_name'],
+        'email' => $data['email'] ?? null,
+        'phone' => $data['phone'],
+        'role' => $data['role'],
+        'status' => $data['status'],
+
+        'market_id' => $data['market_id'] ?? null,
+
+        'city' => $data['city'] ?? null,
+
+        'student_mode' => $data['student_mode'],
+        'grade_level' =>
+         $data['grade_level'] ?? null,
+        'branch' => $data['branch'] ?? null,
+    ];
+
+    if (!empty($data['password'])) {
+        $userData['password_hash'] = Hash::make($data['password']);
     }
 
-    public function updateAccount(Request $request, int $id): RedirectResponse
-    {
-        $account = DB::table('users')->where('id', $id)->first();
-        abort_unless($account, 404);
+    DB::table('users')
+        ->where('id', $id)
+        ->update($userData);
 
-        $data = $request->validate([
-            'full_name' => ['required', 'string', 'max:160'],
-            'email' => ['nullable', 'email', 'max:160', 'unique:users,email,'.$id],
-            'phone' => ['required', 'string', 'max:30', 'unique:users,phone,'.$id],
-            'role' => ['required', 'in:student,teacher,admin'],
-            'status' => ['required', 'in:active,inactive'],
-            'country' => ['nullable', 'string', 'max:80'],
-            'city' => ['nullable', 'string', 'max:100'],
-            'student_mode' => ['required', 'in:regular,external'],
-            'grade_level' => ['nullable', 'string', 'max:30'],
-            'branch' => ['nullable', 'in:general,scientific,literary'],
-            'password' => ['nullable', 'string', 'min:8', 'regex:/[A-Z]/', 'regex:/[^a-zA-Z0-9]/'],
-        ]);
-
-        $userData = [
-            'full_name' => $data['full_name'], 'email' => $data['email'] ?? null,
-            'phone' => $data['phone'], 'role' => $data['role'], 'status' => $data['status'],
-            'country' => $data['country'] ?? null, 'city' => $data['city'] ?? null,
-            'student_mode' => $data['student_mode'], 'grade_level' => $data['grade_level'] ?? null,
-            'branch' => $data['branch'] ?? null,
-        ];
-        if (! empty($data['password'])) {
-            $userData['password_hash'] = Hash::make($data['password']);
-        }
-        DB::table('users')->where('id', $id)->update($userData);
-
-        return back()->with('success', 'تم حفظ تعديلات الحساب.');
-    }
+    return back()->with('success', 'تم حفظ تعديلات الحساب.');
+}
 }
