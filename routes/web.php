@@ -39,6 +39,8 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects.index');
     Route::get('/recordings', [RecordingsController::class, 'index'])->middleware('role:student,teacher')->name('recordings.index');
     Route::post('/enrollments', [SubjectController::class, 'enroll'])->name('enrollments.store');
+    Route::put('/student/profile', [SubjectController::class, 'updateProfile'])
+    ->name('student.profile.update');
     Route::get('/payment', [PaymentController::class, 'create'])->middleware('role:student')->name('payment.create');
     Route::post('/payment', [PaymentController::class, 'store'])->middleware('role:student')->name('payment.store');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

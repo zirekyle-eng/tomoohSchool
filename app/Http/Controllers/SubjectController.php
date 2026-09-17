@@ -9,16 +9,34 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Illuminate\Validation\Rule;
 
 class SubjectController extends Controller
 {
     public function index(): View
     {
-        $subjects = Subject::query()
+        $student = Auth::user();
+
+        $subjectsQuery = Subject::query()
             ->with('grade')
-            ->where('status', 'active')
-            ->orderBy('name')
-            ->get();
+            ->where('status', 'active');
+
+        if ($student && $student->role === 'student') {
+            $gradeId = DB::table('grades')
+                ->get(['id', 'name'])
+                ->first(function ($grade) use ($student): bool {
+                    $normalized = preg_replace('/^الصف\s*/u', '', $grade->name) ?: $grade->name;
+
+                    return $normalized === $student->grade_level;
+                })?->id;
+
+                $subjectsQuery
+                ->where('grade_id', $gradeId ?? 0)
+                ->when($student->market_id, fn ($query) => $query->where('market_id', $student->market_id));
+        }
+        // dd($gradeId);
+
+        $subjects = $subjectsQuery->orderBy('name')->get();
 
         return view('subjects.index', compact('subjects'));
     }
@@ -67,6 +85,49 @@ class SubjectController extends Controller
 
         return view('dashboard', compact('enrollments', 'classes', 'schoolDayOpen', 'attendanceStarted'));
     }
+
+
+
+
+    public function updateProfile(Request $request): RedirectResponse
+{
+    $user = $request->user();
+
+    $data = $request->validate([
+        'full_name' => ['required', 'string', 'max:160'],
+
+        'phone' => [
+            'required',
+            'string',
+            'max:30',
+            Rule::unique('users', 'phone')->ignore($user->id),
+        ],
+
+        'email' => [
+            'nullable',
+            'email',
+            'max:160',
+            Rule::unique('users', 'email')->ignore($user->id),
+        ],
+    ], [
+        'full_name.required' => 'الاسم الكامل مطلوب.',
+
+        'phone.required' => 'رقم الجوال مطلوب.',
+        'phone.unique' => 'رقم الجوال مستخدم مسبقًا.',
+
+        'email.email' => 'يرجى إدخال بريد إلكتروني صحيح.',
+        'email.unique' => 'البريد الإلكتروني مستخدم مسبقًا.',
+    ]);
+
+    $user->update([
+        'full_name' => $data['full_name'],
+        'phone' => $data['phone'],
+        'email' => $data['email'] ?? null,
+    ]);
+
+    return back()->with('success', 'تم تحديث بيانات ملفك الشخصي بنجاح.');
+}
+
 
     public function startSchoolDay(Request $request): RedirectResponse
     {

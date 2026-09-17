@@ -51,17 +51,27 @@ class AdminController extends Controller
             ->get();
 
         $markets = DB::table('markets')->get();
-        // dd($markets);
 
-        $enrollmentStudents = DB::table('users')->where('role', 'student')->orderBy('full_name')->get(['id', 'full_name', 'phone']);
+        $enrollmentStudents = DB::table('users')
+            ->where('role', 'student')
+            ->orderBy('full_name')
+            ->get(['id', 'full_name', 'phone', 'grade_level', 'market_id']);
+
+        $studentEnrollments = DB::table('enrollments')
+            ->select('student_id', 'subject_id')
+            ->get()
+            ->groupBy('student_id')
+            ->map(fn ($rows) => $rows->pluck('subject_id')->all());
+
         $subjects = DB::table('subjects as s')
             ->join('grades as g', 'g.id', '=', 's.grade_id')
             ->where('s.status', 'active')
             ->orderBy('g.sort_order')->orderBy('s.name')
-            ->get(['s.id', 's.name', 's.monthly_fee', 's.grade_id', 'g.name as grade_name']);
-        $grades = DB::table('grades')->orderBy('sort_order')->orderBy('name')->get(['name']);
-// dd($grades);
-        return view('admin.students', compact('students', 'enrollmentStudents', 'subjects', 'grades' , 'markets'));
+            ->get(['s.id', 's.name', 's.monthly_fee', 's.grade_id', 's.market_id', 'g.name as grade_name']);
+
+        $grades = DB::table('grades')->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
+
+        return view('admin.students', compact('students', 'enrollmentStudents', 'subjects', 'grades', 'markets', 'studentEnrollments'));
     }
 
     public function storeStudent(Request $request, MoodleService $moodle): RedirectResponse
@@ -109,8 +119,14 @@ class AdminController extends Controller
             ]);
 
             if ($student->student_mode === 'regular') {
-                $gradeId = DB::table('grades')->where('name', 'الصف '.$student->grade_level)->value('id');
-                $subjectIds = DB::table('subjects')
+                $gradeId = DB::table('grades')
+                ->get(['id', 'name'])
+                ->first(function ($grade) use ($student): bool {
+                    $normalized = preg_replace('/^الصف\s*/u', '', $grade->name) ?: $grade->name;
+                    return $normalized === $student->grade_level;
+                })
+                ?->id;
+                                $subjectIds = DB::table('subjects')
                     ->where('grade_id', $gradeId)
                     ->where('status', 'active')
                     ->whereIn('tawjihi_branch', ['general', $student->branch])
