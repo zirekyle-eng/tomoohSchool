@@ -52,11 +52,21 @@
                     @foreach($grades as $grade)<option value="{{ $grade->id }}">{{ $grade->name }}</option>@endforeach
                 </select>
             </label>
+
+            <label class="schedule-field">القسم
+                <select id="schedule-branch">
+                    <option value="">كل الأقسام</option>
+                    <option value="general">مشترك</option>
+                    <option value="scientific">علمي</option>
+                    <option value="literary">أدبي</option>
+                </select>
+            </label>
+
             <label class="schedule-field">المادة
                 <select name="subject_id" id="schedule-subject" required>
                     <option value="">اختر المادة</option>
-                    @foreach($subjects as $subject)<option value="{{ $subject->id }}" data-grade="{{ $subject->grade_id }}">{{ $subject->name }}</option>@endforeach
-                </select>
+@foreach($subjects as $subject)<option value="{{ $subject->id }}" data-grade="{{ $subject->grade_id }}" data-branch="{{ $subject->tawjihi_branch }}">{{ $subject->name }}</option>@endforeach
+   </select>
             </label>
             <label class="schedule-field">المدرس
                 <select name="teacher_id" required>
@@ -82,7 +92,13 @@
                 <h2>الحصص الأسبوعية</h2>
                 <div class="calendar-filter">
                     <select id="calendar-grade"><option value="">كل الصفوف</option>@foreach($grades as $grade)<option value="{{ $grade->id }}">{{ $grade->name }}</option>@endforeach</select>
-                    <select id="calendar-subject"><option value="">كل المواد</option>@foreach($subjects as $subject)<option value="{{ $subject->id }}" data-grade="{{ $subject->grade_id }}">{{ $subject->name }}</option>@endforeach</select>
+                    <select id="calendar-branch">
+                        <option value="">كل الأقسام</option>
+                        <option value="general">مشترك</option>
+                        <option value="scientific">علمي</option>
+                        <option value="literary">أدبي</option>
+                    </select>
+                    <select id="calendar-subject"><option value="">كل المواد</option>@foreach($subjects as $subject)<option value="{{ $subject->id }}" data-grade="{{ $subject->grade_id }}" data-branch="{{ $subject->tawjihi_branch }}">{{ $subject->name }}</option>@endforeach</select>
                 </div>
             </div>
             @foreach($days as $dayNumber => $dayName)
@@ -90,8 +106,8 @@
                 <div class="day-column" data-day="{{ $dayNumber }}">
                     <div class="day-name">{{ $dayName }}</div>
                     @forelse($dayClasses as $class)
-                        <article class="class-card" data-grade="{{ $class->grade_id }}" data-subject="{{ $class->subject_id }}">
-                            <span class="class-time">{{ substr($class->starts_at, 0, 5) }} - {{ substr($class->ends_at, 0, 5) }}</span>
+                    <article class="class-card" data-grade="{{ $class->grade_id }}" data-subject="{{ $class->subject_id }}" data-branch="{{ $class->tawjihi_branch }}">
+                         <span class="class-time">{{ substr($class->starts_at, 0, 5) }} - {{ substr($class->ends_at, 0, 5) }}</span>
                             <h3>{{ $class->subject_name }}</h3>
                             <p>{{ $class->teacher_name }}</p>
                             <p>{{ $class->room_code ?: 'بدون رمز غرفة' }}</p>
@@ -113,39 +129,55 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const grade = document.querySelector('#schedule-grade');
+    const branch = document.querySelector('#schedule-branch');
     const subject = document.querySelector('#schedule-subject');
     const calendarGrade = document.querySelector('#calendar-grade');
+    const calendarBranch = document.querySelector('#calendar-branch');
     const calendarSubject = document.querySelector('#calendar-subject');
-    function filterSubjects(select, gradeValue) {
+
+    function filterSubjects(select, gradeValue, branchValue) {
         if (!select) return;
         Array.from(select.options).forEach(function (option) {
             if (!option.value) return;
-            option.hidden = Boolean(gradeValue && option.dataset.grade !== gradeValue);
+            const gradeMismatch = Boolean(gradeValue) && option.dataset.grade !== gradeValue;
+            const branchMismatch = Boolean(branchValue) && option.dataset.branch !== branchValue;
+            option.hidden = gradeMismatch || branchMismatch;
         });
-        if (select.value && select.selectedOptions[0].hidden) select.value = '';
+        if (select.value && select.selectedOptions[0] && select.selectedOptions[0].hidden) select.value = '';
     }
+
+    function refreshFormSubjects() {
+        filterSubjects(subject, grade ? grade.value : '', branch ? branch.value : '');
+    }
+
     function refreshCalendar() {
         if (!calendarGrade || !calendarSubject) return;
         const gradeValue = calendarGrade.value;
-        filterSubjects(calendarSubject, gradeValue);
+        const branchValue = calendarBranch ? calendarBranch.value : '';
+        filterSubjects(calendarSubject, gradeValue, branchValue);
         const subjectValue = calendarSubject.value;
+
         document.querySelectorAll('.day-column').forEach(function (day) {
             let visibleCards = 0;
             day.querySelectorAll('.class-card').forEach(function (card) {
                 const matchesGrade = !gradeValue || card.dataset.grade === gradeValue;
+                const matchesBranch = !branchValue || card.dataset.branch === branchValue;
                 const matchesSubject = !subjectValue || card.dataset.subject === subjectValue;
-                card.hidden = !(matchesGrade && matchesSubject);
-                if (matchesGrade && matchesSubject) visibleCards += 1;
+                const matches = matchesGrade && matchesBranch && matchesSubject;
+                card.hidden = !matches;
+                if (matches) visibleCards += 1;
             });
             const emptyMessage = day.querySelector('.day-empty');
             if (emptyMessage) emptyMessage.hidden = visibleCards > 0;
         });
     }
-    if (grade && subject) {
-        grade.addEventListener('change', function () { filterSubjects(subject, grade.value); });
-    }
+
+    if (grade) grade.addEventListener('change', refreshFormSubjects);
+    if (branch) branch.addEventListener('change', refreshFormSubjects);
+
     if (calendarGrade && calendarSubject) {
         calendarGrade.addEventListener('change', refreshCalendar);
+        if (calendarBranch) calendarBranch.addEventListener('change', refreshCalendar);
         calendarSubject.addEventListener('change', refreshCalendar);
         refreshCalendar();
     }

@@ -373,9 +373,9 @@ class AdminController extends Controller
             ->join('users as u', 'u.id', '=', 'cs.teacher_id')
             ->leftJoin('teachers_profiles as tp', 'tp.user_id', '=', 'u.id')
             ->orderBy('cs.day_of_week')->orderBy('cs.starts_at')
-            ->select('cs.*', 's.name as subject_name', 's.grade_id', 'g.name as grade_name', 'u.full_name as teacher_name', 'tp.photo_path')
+            ->select('cs.*', 's.name as subject_name', 's.grade_id', 's.tawjihi_branch', 'g.name as grade_name', 'u.full_name as teacher_name', 'tp.photo_path')
             ->get();
-        $subjects = DB::table('subjects')->where('status', 'active')->orderBy('name')->get()->unique('name')->values();
+        $subjects = DB::table('subjects')->where('status', 'active')->orderBy('name')->get();
         $grades = DB::table('grades')->orderBy('sort_order')->orderBy('name')->get();
         $teachers = DB::table('users')->where('role', 'teacher')->where('status', 'active')->orderBy('full_name')->get(['id', 'full_name']);
         $days = [1 => 'السبت', 2 => 'الأحد', 3 => 'الإثنين', 4 => 'الثلاثاء', 5 => 'الأربعاء', 6 => 'الخميس', 7 => 'الجمعة'];
